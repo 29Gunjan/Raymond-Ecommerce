@@ -1,0 +1,136 @@
+/* Admin Orders Styles */
+.admin-orders {
+    padding: var(--spacing-xl);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+}
+
+.filter-tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    background-color: var(--background-alt);
+    transition: all var(--transition-fast);
+}
+
+.filter-tab:hover {
+    background-color: var(--border);
+}
+
+.filter-tab.active {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+/* Orders Table */
+.orders-table-container {
+    background-color: #fff;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.customer-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.customer-name {
+    font-weight: 500;
+}
+
+.customer-email {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
+
+.status-select {
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.status-select.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-select.status-confirmed {
+    background-color: #d1e7dd;
+    color: #0a3622;
+}
+
+.status-select.status-processing {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.status-select.status-shipped {
+    background-color: #e0e0ff;
+    color: #3b3b6d;
+}
+
+.status-select.status-delivered {
+    background-color: #d1e7dd;
+    color: #0a3622;
+}
+
+.status-select.status-cancelled {
+    background-color: #f8d7da;
+    color: #58151c;
+}
+
+.payment-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.payment-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.payment-badge.paid {
+    background-color: #d1e7dd;
+    color: #0a3622;
+}
+
+.payment-badge.failed {
+    background-color: #f8d7da;
+    color: #58151c;
+}
+
+.empty-table {
+    padding: var(--spacing-2xl);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-orders {
+        padding: var(--spacing-md);
+    }
+
+    .orders-table-container {
+        overflow-x: auto;
+    }
+}

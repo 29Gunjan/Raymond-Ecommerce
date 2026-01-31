@@ -1,0 +1,198 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Particles from './components/Particles';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import WishlistPage from './pages/WishlistPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import NotFoundPage from './pages/NotFoundPage';
+
+// Support & Company Pages
+import TrackOrderPage from './pages/TrackOrderPage';
+import ReturnsPage from './pages/ReturnsPage';
+import ShippingPage from './pages/ShippingPage';
+import FAQPage from './pages/FAQPage';
+import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import CareersPage from './pages/CareersPage';
+import StoreLocatorPage from './pages/StoreLocatorPage';
+import StyleBlogPage from './pages/StyleBlogPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
+import { ForgotPasswordPage, ResetPasswordPage } from './pages/ResetPasswordPage';
+
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminCategories from './pages/admin/AdminCategories';
+
+// Admin Route Wrapper
+function AdminRoute({ children }) {
+    const { isAuthenticated, isAdmin } = useAuth();
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (!isAdmin) {
+        return <Navigate to="/" replace />;
+    }
+
+    return children;
+}
+
+function App() {
+    return (
+        <div className="app relative">
+            {/* Particle Background */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <Particles
+                    particleColors={['#ffffff', '#e5e7eb', '#d1d5db']}
+                    particleCount={120}
+                    particleSpread={12}
+                    speed={0.03}
+                    particleBaseSize={60}
+                    moveParticlesOnHover={true}
+                    particleHoverFactor={0.3}
+                    alphaParticles={true}
+                    sizeRandomness={0.6}
+                    cameraDistance={30}
+                    disableRotation={false}
+                    pixelRatio={1}
+                />
+            </div>
+
+            <div className="relative z-10">
+                <Header />
+                <main className="main-content">
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/products" element={<ProductsPage />} />
+                        <Route path="/products/:slug" element={<ProductDetailPage />} />
+                        <Route path="/category/:slug" element={<ProductsPage />} />
+                        <Route path="/cart" element={<CartPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                        <Route path="/reset-password" element={<ResetPasswordPage />} />
+                        <Route
+                            path="/checkout"
+                            element={
+                                <ProtectedRoute>
+                                    <CheckoutPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <ProfilePage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/orders"
+                            element={
+                                <ProtectedRoute>
+                                    <OrdersPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/orders/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <OrderDetailPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/wishlist"
+                            element={
+                                <ProtectedRoute>
+                                    <WishlistPage />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Admin Routes */}
+                        <Route
+                            path="/admin"
+                            element={
+                                <AdminRoute>
+                                    <AdminDashboard />
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/products"
+                            element={
+                                <AdminRoute>
+                                    <AdminProducts />
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/orders"
+                            element={
+                                <AdminRoute>
+                                    <AdminOrders />
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/users"
+                            element={
+                                <AdminRoute>
+                                    <AdminUsers />
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/categories"
+                            element={
+                                <AdminRoute>
+                                    <AdminCategories />
+                                </AdminRoute>
+                            }
+                        />
+
+                        {/* Support Pages */}
+                        <Route path="/track-order" element={<TrackOrderPage />} />
+                        <Route path="/returns" element={<ReturnsPage />} />
+                        <Route path="/shipping" element={<ShippingPage />} />
+                        <Route path="/faq" element={<FAQPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+
+                        {/* Company Pages */}
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route path="/careers" element={<CareersPage />} />
+                        <Route path="/stores" element={<StoreLocatorPage />} />
+                        <Route path="/blog" element={<StyleBlogPage />} />
+
+                        {/* 404 Not Found */}
+                        <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                </main>
+                <Footer />
+            </div>
+        </div>
+    );
+}
+
+export default App;
+
+

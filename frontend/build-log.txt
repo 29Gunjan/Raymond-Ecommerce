@@ -1,0 +1,135 @@
+﻿docker-compose : 
+time="2026-01-31T00:54:48+05:30" 
+level=warning msg="C:\\Users\\Gunja\\
+Desktop\\Raymond 
+E-commerse\\docker-compose.yml: the 
+attribute `version` is obsolete, it 
+will be ignored, please remove it to 
+avoid potential confusion"
+At line:1 char:1
++ docker-compose build frontend 2>&1 
+| Out-File -FilePath .\frontend\bu 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+NotSpecifie    d: 
+(time="2026-01-3...tial confusion"   
+ :String) [], RemoteException
+    + FullyQualifiedErrorId : 
+NativeComma    ndError
+ 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.07kB done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 511B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/nginx:alpine
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/node:20-alpine
+#4 DONE 1.2s
+
+#3 [internal] load metadata for docker.io/library/nginx:alpine
+#3 DONE 1.2s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 93B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 3.77kB 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-1 1/3] FROM docker.io/library/nginx:alpine@sha256:7d7a15b8a280c661051955f14c2b91fed3e23724ddba18d2f53e8b44e74ab37a
+#7 resolve docker.io/library/nginx:alpine@sha256:7d7a15b8a280c661051955f14c2b91fed3e23724ddba18d2f53e8b44e74ab37a
+#7 resolve docker.io/library/nginx:alpine@sha256:7d7a15b8a280c661051955f14c2b91fed3e23724ddba18d2f53e8b44e74ab37a 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 1/6] FROM docker.io/library/node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8
+#8 resolve docker.io/library/node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8 0.1s done
+#8 DONE 0.1s
+
+#9 [builder 3/6] COPY package*.json ./
+#9 CACHED
+
+#10 [builder 2/6] WORKDIR /app
+#10 CACHED
+
+#11 [builder 4/6] RUN npm ci
+#11 CACHED
+
+#12 [builder 5/6] COPY . .
+#12 DONE 0.2s
+
+#13 [builder 6/6] RUN npm run build
+#13 0.930 
+#13 0.930 > raymond-ecommerce-frontend@1.0.0 build
+#13 0.930 > vite build
+#13 0.930 
+#13 1.573 vite v5.4.21 building for production...
+#13 1.719 transforming...
+#13 9.259 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:31386): "PerspectiveCamera" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.262 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:31480): "Scene" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.265 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:31782): "CanvasTexture" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.268 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:31846): "NearestFilter" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.271 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:31966): "PlaneGeometry" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.275 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:32011): "ShaderMaterial" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.278 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:33252): "Mesh" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.282 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:33346): "WebGLRenderer" is not exported by "__vite-optional-peer-dep:three:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.292 Γ£ô 533 modules transformed.
+#13 9.297 x Build failed in 7.65s
+#13 9.297 error during build:
+#13 9.297 node_modules/@appletosolutions/reactbits/dist/index.es.js (1:1236): "shaderMaterial" is not exported by "__vite-optional-peer-dep:@react-three/drei:@appletosolutions/reactbits", imported by "node_modules/@appletosolutions/reactbits/dist/index.es.js".
+#13 9.297 file: /app/node_modules/@appletosolutions/reactbits/dist/index.es.js:1:1236
+#13 9.297 
+#13 9.297 1: import{jsx as e,jsxs as t,Fragment as n}from"react/jsx-runtime";import React,{useRef as i,useEffect as r,useState as o,useMemo as a,useLayoutEffect as s,forwardRef as c,useCallback as l,Suspense as u,Children as h,cloneElement as d,isValidElement as m,useImperativeHandle as p}from"react";import f,{gsap as v}from"gsap";import{ScrollTrigger as g}from"gsap/ScrollTrigger";import{SplitText as x}from"gsap/SplitText";import{motion as y,useAnimation as w,useMotionValue as b,AnimatePresence as M,useScroll as P,useVelocity as S,useSpring as C,useTransform as E,useAnimationFrame as z,useInView as _,useMotionValueEvent as T,animate as A}from"framer-motion";import R from"matter-js";import*as I from"three";import{Color as L,Object3D as F,Vector2 as k,MathUtils as D,Vector3 as N,ACESFilmicToneMapping as B,Raycaster as U,Plane as O,Clock as V,InstancedMesh as X,PMREMGenerator as q,SphereGeometry as Y,MeshPhysicalMaterial as $,ShaderChunk as W,PerspectiveCamera as H,Scene as G,WebGLRenderer as j,SRGBColorSpace as Z,AmbientLight as K,PointLight as Q}from"three";import{ScrambleTextPlugin as J}from"gsap/ScrambleTextPlugin";import{Canvas as ee,useThree as te,invalidate as ne,useLoader as ie,useFrame as re}from"@react-three/fiber";import{shaderMate...
+#13 9.297                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ^
+#13 9.297 2: //# sourceMappingURL=index.es.js.map
+#13 9.297 
+#13 9.297     at getRollupError (file:///app/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+#13 9.297     at error (file:///app/node_modules/rollup/dist/es/shared/parseAst.js:398:42)
+#13 9.297     at Module.error (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:17040:16)
+#13 9.297     at Module.traceVariable (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:17452:29)
+#13 9.297     at ModuleScope.findVariable (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:15070:39)
+#13 9.297     at Identifier.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:5447:40)
+#13 9.297     at CallExpression.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+#13 9.297     at CallExpression.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:12179:15)
+#13 9.297     at VariableDeclarator.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+#13 9.297     at VariableDeclaration.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2825:28)
+#13 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
+------
+ > [builder 6/6] RUN npm run build:
+9.297     at getRollupError (file:///app/node_modules/rollup/dist/es/shared/parseAst.js:402:41)
+9.297     at error (file:///app/node_modules/rollup/dist/es/shared/parseAst.js:398:42)
+9.297     at Module.error (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:17040:16)
+9.297     at Module.traceVariable (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:17452:29)
+9.297     at ModuleScope.findVariable (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:15070:39)
+9.297     at Identifier.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:5447:40)
+9.297     at CallExpression.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+9.297     at CallExpression.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:12179:15)
+9.297     at VariableDeclarator.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2829:23)
+9.297     at VariableDeclaration.bind (file:///app/node_modules/rollup/dist/es/shared/node-entry.js:2825:28)
+------
+Dockerfile:16
+
+--------------------
+
+  14 |     
+
+  15 |     # Build the app
+
+  16 | >>> RUN npm run build
+
+  17 |     
+
+  18 |     # Production stage
+
+--------------------
+
+failed to solve: process "/bin/sh -c 
+npm run build" did not complete 
+successfully: exit code: 1
+
