@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import { ProductGridSkeleton } from '../components/Skeleton';
 import { productsAPI, categoriesAPI } from '../services/api';
 
 function ProductsPage() {
@@ -73,60 +74,60 @@ function ProductsPage() {
     const currentCategory = categories.find(c => c.slug === filters.category);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-slate-50">
             {/* Page Header */}
-            <div className="bg-[#12121a] border-b border-gray-800 py-12">
-                <div className="container">
-                    <h1 className="text-3xl md:text-4xl font-heading text-white">
+            <div className="bg-white border-b border-slate-100 py-14">
+                <div className="container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-heading text-slate-900" data-aos="fade-up">
                         {currentCategory?.name || 'All Products'}
                     </h1>
                     {filters.search && (
-                        <p className="mt-2 text-gray-400">
-                            Search results for: "{filters.search}"
+                        <p className="mt-3 text-slate-600 text-lg" data-aos="fade-up" data-aos-delay="100">
+                            Search results for: "<span className="text-[#DA2439] font-medium">{filters.search}</span>"
                         </p>
                     )}
                 </div>
             </div>
 
-            <div className="container py-8">
+            <div className="container mx-auto px-4 py-10">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Filters Sidebar */}
-                    <aside className={`lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-                        <div className="bg-[#12121a] rounded-xl p-6 border border-gray-800 sticky top-24">
+                    <aside className={`lg:w-72 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+                        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm sticky top-28">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-lg font-semibold text-white">Filters</h2>
+                                <h2 className="text-lg font-bold text-slate-900">Filters</h2>
                                 <button
                                     onClick={clearFilters}
-                                    className="text-sm text-amber-500 hover:text-amber-400 transition-colors"
+                                    className="text-sm text-[#DA2439] hover:text-[#b91d30] font-medium transition-colors"
                                 >
                                     Clear All
                                 </button>
                             </div>
 
                             {/* Categories */}
-                            <div className="mb-6">
-                                <h3 className="font-medium mb-3 text-white">Category</h3>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 cursor-pointer">
+                            <div className="mb-8">
+                                <h3 className="font-semibold mb-4 text-slate-900">Category</h3>
+                                <div className="space-y-3">
+                                    <label className="flex items-center gap-3 cursor-pointer group">
                                         <input
                                             type="radio"
                                             name="category"
                                             checked={!filters.category}
                                             onChange={() => handleFilterChange('category', '')}
-                                            className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 focus:ring-offset-gray-900"
+                                            className="w-5 h-5 text-[#DA2439] bg-white border-slate-300 focus:ring-[#DA2439]"
                                         />
-                                        <span className="text-sm text-gray-300">All Categories</span>
+                                        <span className="text-slate-600 group-hover:text-slate-900 transition-colors">All Categories</span>
                                     </label>
                                     {categories.map(cat => (
-                                        <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                                        <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
                                             <input
                                                 type="radio"
                                                 name="category"
                                                 checked={filters.category === cat.slug}
                                                 onChange={() => handleFilterChange('category', cat.slug)}
-                                                className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 focus:ring-offset-gray-900"
+                                                className="w-5 h-5 text-[#DA2439] bg-white border-slate-300 focus:ring-[#DA2439]"
                                             />
-                                            <span className="text-sm text-gray-300">{cat.name}</span>
+                                            <span className="text-slate-600 group-hover:text-slate-900 transition-colors">{cat.name}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -134,21 +135,21 @@ function ProductsPage() {
 
                             {/* Price Range */}
                             <div className="mb-6">
-                                <h3 className="font-medium mb-3 text-white">Price Range</h3>
-                                <div className="flex gap-2">
+                                <h3 className="font-semibold mb-4 text-slate-900">Price Range</h3>
+                                <div className="flex gap-3">
                                     <input
                                         type="number"
                                         placeholder="Min"
                                         value={filters.minPrice}
                                         onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#DA2439] focus:border-transparent"
                                     />
                                     <input
                                         type="number"
                                         placeholder="Max"
                                         value={filters.maxPrice}
                                         onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#DA2439] focus:border-transparent"
                                     />
                                 </div>
                             </div>
@@ -158,21 +159,26 @@ function ProductsPage() {
                     {/* Main Content */}
                     <main className="flex-1">
                         {/* Toolbar */}
-                        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                            <p className="text-gray-400">
-                                Showing {products.length} of {pagination.total} products
+                        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+                            <p className="text-slate-600">
+                                Showing <span className="font-semibold text-slate-900">{products.length}</span> of <span className="font-semibold text-slate-900">{pagination.total}</span> products
                             </p>
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className="lg:hidden btn btn-secondary btn-sm"
+                                    className="lg:hidden px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                                 >
-                                    Filters
+                                    <span className="flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                        </svg>
+                                        Filters
+                                    </span>
                                 </button>
                                 <select
                                     value={filters.sort}
                                     onChange={(e) => handleFilterChange('sort', e.target.value)}
-                                    className="px-4 py-2 bg-[#12121a] border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
+                                    className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#DA2439] focus:border-transparent"
                                 >
                                     <option value="newest">Newest First</option>
                                     <option value="price-low">Price: Low to High</option>
@@ -184,19 +190,17 @@ function ProductsPage() {
 
                         {/* Products Grid */}
                         {loading ? (
-                            <div className="loading-container">
-                                <div className="spinner"></div>
-                            </div>
+                            <ProductGridSkeleton count={12} />
                         ) : products.length === 0 ? (
-                            <div className="empty-state">
-                                <div className="empty-state-icon">
+                            <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
+                                <div className="w-20 h-20 mx-auto mb-6 text-slate-300">
                                     <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
                                 </div>
-                                <h2 className="empty-state-title">No products found</h2>
-                                <p className="empty-state-text">Try adjusting your filters or search criteria</p>
-                                <button onClick={clearFilters} className="btn btn-primary">
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">No products found</h2>
+                                <p className="text-slate-500 mb-6">Try adjusting your filters or search criteria</p>
+                                <button onClick={clearFilters} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors">
                                     Clear Filters
                                 </button>
                             </div>
@@ -210,11 +214,11 @@ function ProductsPage() {
 
                                 {/* Pagination */}
                                 {pagination.pages > 1 && (
-                                    <div className="flex justify-center gap-2 mt-12">
+                                    <div className="flex justify-center gap-2 mt-14">
                                         <button
                                             onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                                             disabled={pagination.page === 1}
-                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                            className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                         >
                                             Previous
                                         </button>
@@ -222,7 +226,10 @@ function ProductsPage() {
                                             <button
                                                 key={page}
                                                 onClick={() => setPagination(prev => ({ ...prev, page }))}
-                                                className={`btn btn-sm ${pagination.page === page ? 'btn-primary' : 'btn-ghost'}`}
+                                                className={`w-10 h-10 rounded-xl text-sm font-semibold transition-all ${pagination.page === page
+                                                    ? 'bg-slate-900 text-white shadow-lg'
+                                                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                                                    }`}
                                             >
                                                 {page}
                                             </button>
@@ -230,7 +237,7 @@ function ProductsPage() {
                                         <button
                                             onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                                             disabled={pagination.page === pagination.pages}
-                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                            className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                         >
                                             Next
                                         </button>

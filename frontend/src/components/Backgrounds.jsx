@@ -6,7 +6,7 @@ export function GradientBackground({ children, className = '' }) {
         <div className={`relative overflow-hidden ${className}`}>
             {/* Animated gradient orbs */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-500/20 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
             </div>
@@ -22,7 +22,7 @@ export function ParticlesBackground({ count = 50, className = '' }) {
             {Array.from({ length: count }).map((_, i) => (
                 <div
                     key={i}
-                    className="absolute w-1 h-1 bg-amber-500/30 rounded-full animate-float-particle"
+                    className="absolute w-1 h-1 bg-red-500/30 rounded-full animate-float-particle"
                     style={{
                         left: `${Math.random() * 100}%`,
                         top: `${Math.random() * 100}%`,

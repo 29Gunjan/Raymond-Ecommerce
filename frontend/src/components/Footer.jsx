@@ -6,10 +6,10 @@ function Footer() {
     const footerLinks = {
         shop: [
             { to: '/products', label: 'All Products' },
-            { to: '/category/suits-blazers', label: 'Suits & Blazers' },
-            { to: '/category/shirts', label: 'Shirts' },
-            { to: '/category/trousers', label: 'Trousers' },
-            { to: '/category/accessories', label: 'Accessories' },
+            { to: '/products/suits-blazers', label: 'Suits & Blazers' },
+            { to: '/products/shirts', label: 'Shirts' },
+            { to: '/products/trousers', label: 'Trousers' },
+            { to: '/products/accessories', label: 'Accessories' },
         ],
         support: [
             { to: '/track-order', label: 'Track Order' },
@@ -23,6 +23,8 @@ function Footer() {
             { to: '/careers', label: 'Careers' },
             { to: '/stores', label: 'Store Locator' },
             { to: '/blog', label: 'Style Blog' },
+            { to: '/size-guide', label: 'Size Guide' },
+            { to: '/email-preferences', label: 'Email Preferences' },
         ],
     };
 
@@ -60,24 +62,27 @@ function Footer() {
     };
 
     return (
-        <footer className="bg-[#06060a] text-white relative overflow-hidden border-t border-gray-800">
+        <footer className="bg-gray-900 text-white relative overflow-hidden">
+            {/* Raymond Red Accent Line */}
+            <div className="h-1 bg-[#DA2439]" />
+
             {/* Newsletter Section */}
             <div className="border-b border-gray-800">
-                <div className="container py-12">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="container mx-auto px-4 py-14">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                         <div>
-                            <h3 className="text-2xl font-heading mb-2 text-white">Stay Updated</h3>
-                            <p className="text-gray-400">Subscribe for exclusive offers and style tips</p>
+                            <h3 className="text-3xl font-heading mb-2 text-white">Stay Updated</h3>
+                            <p className="text-gray-400 text-lg">Subscribe for exclusive offers and style tips</p>
                         </div>
                         <form className="flex w-full md:w-auto gap-3">
                             <input
                                 type="email"
                                 placeholder="Enter your email"
-                                className="flex-1 md:w-72 px-5 py-3 bg-[#12121a] border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="flex-1 md:w-80 px-6 py-4 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#DA2439] focus:border-transparent"
                             />
                             <button
                                 type="submit"
-                                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-full hover:from-amber-600 hover:to-amber-700 transition-all duration-300 whitespace-nowrap"
+                                className="px-8 py-4 bg-[#DA2439] text-white font-semibold rounded-full hover:bg-[#b91d30] transition-all duration-300 whitespace-nowrap shadow-lg"
                             >
                                 Subscribe
                             </button>
@@ -87,15 +92,18 @@ function Footer() {
             </div>
 
             {/* Main Footer Content */}
-            <div className="container py-16 relative z-10">
+            <div className="container mx-auto px-4 py-16 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
                     {/* Brand Column */}
                     <div className="col-span-2 lg:col-span-1">
-                        <Link to="/" className="text-3xl font-heading font-bold inline-block mb-4 text-white">
-                            Raymond
+                        <Link to="/" className="flex items-center gap-3 mb-6 group">
+                            <div className="w-10 h-10 bg-[#DA2439] rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">R</span>
+                            </div>
+                            <span className="text-2xl font-heading font-bold text-white">Raymond</span>
                         </Link>
-                        <p className="text-gray-400 mb-6">
-                            The Complete Man. Crafting premium menswear since 1925.
+                        <p className="text-gray-400 mb-6 leading-relaxed">
+                            The Complete Man. Crafting premium menswear since 1925. Excellence in every stitch.
                         </p>
                         <div className="flex gap-3">
                             {socialLinks.map((social) => (
@@ -103,7 +111,7 @@ function Footer() {
                                     key={social.icon}
                                     href={social.url}
                                     aria-label={social.label}
-                                    className="w-10 h-10 bg-[#12121a] border border-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-amber-500 hover:border-amber-500 hover:text-white transition-all duration-300"
+                                    className="w-11 h-11 bg-gray-800 border border-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#DA2439] hover:border-[#DA2439] hover:text-white transition-all duration-300"
                                 >
                                     {getSocialIcon(social.icon)}
                                 </a>
@@ -113,13 +121,13 @@ function Footer() {
 
                     {/* Shop Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4 text-white">Shop</h4>
-                        <div className="space-y-2">
+                        <h4 className="font-semibold text-lg mb-5 text-white">Shop</h4>
+                        <div className="space-y-3">
                             {footerLinks.shop.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className="block text-gray-400 hover:text-amber-500 transition-colors py-1.5"
+                                    className="block text-gray-400 hover:text-[#DA2439] transition-colors py-1"
                                 >
                                     {link.label}
                                 </Link>
@@ -129,13 +137,13 @@ function Footer() {
 
                     {/* Support Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4 text-white">Support</h4>
-                        <div className="space-y-2">
+                        <h4 className="font-semibold text-lg mb-5 text-white">Support</h4>
+                        <div className="space-y-3">
                             {footerLinks.support.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className="block text-gray-400 hover:text-amber-500 transition-colors py-1.5"
+                                    className="block text-gray-400 hover:text-[#DA2439] transition-colors py-1"
                                 >
                                     {link.label}
                                 </Link>
@@ -145,13 +153,13 @@ function Footer() {
 
                     {/* Company Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-4 text-white">Company</h4>
-                        <div className="space-y-2">
+                        <h4 className="font-semibold text-lg mb-5 text-white">Company</h4>
+                        <div className="space-y-3">
                             {footerLinks.company.map((link) => (
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className="block text-gray-400 hover:text-amber-500 transition-colors py-1.5"
+                                    className="block text-gray-400 hover:text-[#DA2439] transition-colors py-1"
                                 >
                                     {link.label}
                                 </Link>
@@ -159,17 +167,47 @@ function Footer() {
                         </div>
                     </div>
                 </div>
+
+                {/* Payment & Trust Badges */}
+                <div className="mt-12 pt-10 border-t border-gray-800">
+                    <div className="flex flex-wrap justify-center gap-6 text-gray-500 text-sm">
+                        <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span>Secure Payment</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-[#DA2439]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                            <span>Free Shipping ₹2,999+</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>30-Day Returns</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span>24/7 Support</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Bottom Bar */}
-            <div className="border-t border-gray-800">
-                <div className="container py-6">
+            <div className="border-t border-gray-800 bg-gray-950">
+                <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-                        <p>&copy; {currentYear} Raymond. All rights reserved.</p>
+                        <p>© {currentYear} Raymond. All rights reserved. Crafted with ❤️ in India</p>
                         <div className="flex gap-6">
-                            <Link to="/privacy" className="hover:text-amber-500 transition-colors">Privacy Policy</Link>
-                            <Link to="/terms" className="hover:text-amber-500 transition-colors">Terms of Service</Link>
-                            <Link to="/cookies" className="hover:text-amber-500 transition-colors">Cookie Policy</Link>
+                            <Link to="/privacy" className="hover:text-[#DA2439] transition-colors">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-[#DA2439] transition-colors">Terms of Service</Link>
+                            <Link to="/cookies" className="hover:text-[#DA2439] transition-colors">Cookie Policy</Link>
                         </div>
                     </div>
                 </div>

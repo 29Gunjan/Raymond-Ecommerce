@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function FAQPage() {
     const [openIndex, setOpenIndex] = useState(null);
@@ -79,33 +80,46 @@ function FAQPage() {
     ];
 
     return (
-        <div className="min-h-screen py-12">
-            <div className="container max-w-3xl">
-                <h1 className="text-3xl font-heading text-white mb-2">Frequently Asked Questions</h1>
-                <p className="text-gray-400 mb-8">Find answers to common questions about shopping with Raymond</p>
+        <div className="min-h-screen bg-slate-50">
+            {/* Hero Section */}
+            <div className="bg-white border-b border-slate-100 py-16">
+                <div className="container mx-auto px-4 max-w-4xl">
+                    {/* Breadcrumb */}
+                    <div className="flex items-center gap-2 text-sm mb-6">
+                        <Link to="/" className="text-slate-500 hover:text-[#DA2439] transition-colors">Home</Link>
+                        <span className="text-slate-300">/</span>
+                        <span className="text-slate-900 font-medium">FAQ</span>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">Frequently Asked Questions</h1>
+                    <p className="text-lg text-slate-600">Find answers to common questions about shopping with Raymond</p>
+                </div>
+            </div>
 
-                <div className="space-y-8">
+            <div className="container mx-auto px-4 py-12 max-w-4xl">
+                <div className="space-y-10">
                     {faqs.map((category, catIndex) => (
                         <div key={catIndex}>
-                            <h2 className="text-xl font-heading text-amber-500 mb-4">{category.category}</h2>
-                            <div className="space-y-2">
+                            <h2 className="text-2xl font-heading font-bold text-[#DA2439] mb-5">{category.category}</h2>
+                            <div className="space-y-3">
                                 {category.questions.map((faq, faqIndex) => {
                                     const index = `${catIndex}-${faqIndex}`;
                                     const isOpen = openIndex === index;
 
                                     return (
-                                        <div key={faqIndex} className="bg-[#12121a] border border-gray-800 rounded-xl overflow-hidden">
+                                        <div key={faqIndex} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                                             <button
                                                 onClick={() => setOpenIndex(isOpen ? null : index)}
-                                                className="w-full px-6 py-4 flex justify-between items-center text-left hover:bg-gray-900/50 transition-colors"
+                                                className="w-full px-6 py-5 flex justify-between items-center text-left hover:bg-slate-50 transition-colors"
                                             >
-                                                <span className="text-white font-medium pr-4">{faq.q}</span>
-                                                <span className={`text-amber-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-                                                    ▼
+                                                <span className="text-slate-900 font-medium pr-4">{faq.q}</span>
+                                                <span className={`text-[#DA2439] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
                                                 </span>
                                             </button>
                                             {isOpen && (
-                                                <div className="px-6 pb-4 text-gray-400 border-t border-gray-800 pt-4">
+                                                <div className="px-6 pb-5 text-slate-600 border-t border-slate-100 pt-4 bg-slate-50">
                                                     {faq.a}
                                                 </div>
                                             )}
@@ -117,12 +131,20 @@ function FAQPage() {
                     ))}
                 </div>
 
-                <div className="mt-12 text-center bg-[#12121a] border border-gray-800 rounded-xl p-8">
-                    <h3 className="text-xl text-white mb-2">Still have questions?</h3>
-                    <p className="text-gray-400 mb-4">Our support team is here to help</p>
-                    <a href="/contact" className="inline-block px-6 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors">
+                <div className="mt-16 text-center bg-white border border-slate-200 rounded-2xl p-10 shadow-md">
+                    <div className="w-16 h-16 bg-red-100 text-[#DA2439] rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 className="text-2xl font-heading font-bold text-slate-900 mb-3">Still have questions?</h3>
+                    <p className="text-slate-600 mb-6">Our support team is here to help you</p>
+                    <Link
+                        to="/contact"
+                        className="inline-block px-8 py-4 bg-[#DA2439] text-white font-semibold rounded-full hover:bg-[#b91d30] transition-all shadow-lg hover:shadow-xl"
+                    >
                         Contact Us
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

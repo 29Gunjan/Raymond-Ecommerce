@@ -1,0 +1,166 @@
+/* Floating Lights Container */
+.floating-lights-container {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Base Floating Light */
+.floating-light {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    will-change: transform;
+    transition: transform 0.3s ease-out;
+}
+
+/* Light 1 - Primary Red (Top Left) */
+.floating-light-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(218, 36, 57, 0.12) 0%, transparent 70%);
+    top: -10%;
+    left: -5%;
+    animation: floatLight1 25s ease-in-out infinite;
+}
+
+/* Light 2 - Rose (Bottom Right) */
+.floating-light-2 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(244, 63, 94, 0.08) 0%, transparent 70%);
+    bottom: -5%;
+    right: -5%;
+    animation: floatLight2 30s ease-in-out infinite;
+}
+
+/* Light 3 - Soft Center Glow */
+.floating-light-3 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(218, 36, 57, 0.05) 0%, transparent 60%);
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: floatLight3 35s ease-in-out infinite;
+}
+
+/* Light 4 - Accent (Top Right) */
+.floating-light-4 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(253, 224, 71, 0.06) 0%, transparent 70%);
+    top: 10%;
+    right: 15%;
+    animation: floatLight4 20s ease-in-out infinite;
+}
+
+/* Light 5 - Deep Accent (Bottom Left) */
+.floating-light-5 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(180, 83, 9, 0.08) 0%, transparent 70%);
+    bottom: 15%;
+    left: 10%;
+    animation: floatLight5 28s ease-in-out infinite;
+}
+
+/* Float Animations */
+@keyframes floatLight1 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+    }
+
+    25% {
+        transform: translate(40px, 60px) scale(1.1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-30px, 30px) scale(0.95);
+        opacity: 0.7;
+    }
+
+    75% {
+        transform: translate(20px, -40px) scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+@keyframes floatLight2 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.7;
+    }
+
+    33% {
+        transform: translate(-50px, -40px) scale(1.15);
+        opacity: 1;
+    }
+
+    66% {
+        transform: translate(30px, -20px) scale(0.9);
+        opacity: 0.6;
+    }
+}
+
+@keyframes floatLight3 {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+@keyframes floatLight4 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translate(-30px, 40px) scale(1.1);
+        opacity: 0.9;
+    }
+}
+
+@keyframes floatLight5 {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.7;
+    }
+
+    33% {
+        transform: translate(40px, -30px) scale(1.1);
+        opacity: 0.5;
+    }
+
+    66% {
+        transform: translate(-20px, 50px) scale(0.95);
+        opacity: 0.8;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .floating-light {
+        animation: none !important;
+    }
+}

@@ -185,7 +185,7 @@ function OrderDetailPage() {
                                 <hr className="border-gray-800" />
                                 <div className="flex justify-between text-base">
                                     <span className="font-semibold text-white">Total</span>
-                                    <span className="font-bold text-xl text-amber-500">{formatPrice(order.total)}</span>
+                                    <span className="font-bold text-xl text-[#DA2439]">{formatPrice(order.total)}</span>
                                 </div>
                             </div>
 

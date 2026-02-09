@@ -50,7 +50,7 @@ function ForgotPasswordPage() {
                             </p>
                             <Link
                                 to="/login"
-                                className="text-amber-500 hover:text-amber-400 font-medium"
+                                className="text-[#DA2439] hover:text-[#b91d30] font-medium"
                             >
                                 Back to Login
                             </Link>
@@ -69,7 +69,7 @@ function ForgotPasswordPage() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#DA2439] focus:outline-none"
                                     placeholder="Enter your email"
                                     required
                                 />
@@ -78,14 +78,14 @@ function ForgotPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 disabled:opacity-50"
+                                className="w-full py-4 bg-gradient-to-r from-[#DA2439] to-[#b91d30] text-white font-semibold rounded-xl hover:from-[#b91d30] hover:to-[#982028] transition-all duration-300 disabled:opacity-50"
                             >
                                 {loading ? 'Sending...' : 'Send Reset Link'}
                             </button>
 
                             <p className="text-center text-gray-400 mt-6">
                                 Remember your password?{' '}
-                                <Link to="/login" className="text-amber-500 hover:text-amber-400 font-medium">
+                                <Link to="/login" className="text-[#DA2439] hover:text-[#b91d30] font-medium">
                                     Sign In
                                 </Link>
                             </p>
@@ -179,7 +179,7 @@ function ResetPasswordPage() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#DA2439] focus:outline-none"
                                     placeholder="Enter new password"
                                     required
                                     minLength={6}
@@ -192,7 +192,7 @@ function ResetPasswordPage() {
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#DA2439] focus:outline-none"
                                     placeholder="Confirm new password"
                                     required
                                 />
@@ -201,7 +201,7 @@ function ResetPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 disabled:opacity-50"
+                                className="w-full py-4 bg-gradient-to-r from-[#DA2439] to-[#b91d30] text-white font-semibold rounded-xl hover:from-[#b91d30] hover:to-[#982028] transition-all duration-300 disabled:opacity-50"
                             >
                                 {loading ? 'Resetting...' : 'Reset Password'}
                             </button>

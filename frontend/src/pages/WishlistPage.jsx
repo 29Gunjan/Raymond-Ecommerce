@@ -86,12 +86,12 @@ function WishlistPage() {
                                 </Link>
                                 <div className="p-4">
                                     <Link to={`/products/${product.slug}`}>
-                                        <h3 className="font-medium text-white mb-2 line-clamp-2 group-hover:text-amber-400 transition-colors">
+                                        <h3 className="font-medium text-white mb-2 line-clamp-2 group-hover:text-[#DA2439] transition-colors">
                                             {product.name}
                                         </h3>
                                     </Link>
                                     <div className="flex items-center gap-2 mb-3">
-                                        <span className="text-lg font-bold text-amber-500">
+                                        <span className="text-lg font-bold text-[#DA2439]">
                                             {formatPrice(product.price)}
                                         </span>
                                         {product.comparePrice && (

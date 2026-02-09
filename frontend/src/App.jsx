@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Particles from './components/Particles';
+import FloatingLights from './components/FloatingLights';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
@@ -27,6 +28,8 @@ import AboutPage from './pages/AboutPage';
 import CareersPage from './pages/CareersPage';
 import StoreLocatorPage from './pages/StoreLocatorPage';
 import StyleBlogPage from './pages/StyleBlogPage';
+import SizeGuidePage from './pages/SizeGuidePage';
+import EmailPreferencesPage from './pages/EmailPreferencesPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import { ForgotPasswordPage, ResetPasswordPage } from './pages/ResetPasswordPage';
 
@@ -58,20 +61,23 @@ function App() {
             {/* Particle Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <Particles
-                    particleColors={['#ffffff', '#e5e7eb', '#d1d5db']}
-                    particleCount={120}
-                    particleSpread={12}
-                    speed={0.03}
-                    particleBaseSize={60}
+                    particleColors={['#d97706', '#f59e0b', '#fbbf24', '#fcd34d', '#fef3c7']}
+                    particleCount={80}
+                    particleSpread={15}
+                    speed={0.02}
+                    particleBaseSize={80}
                     moveParticlesOnHover={true}
-                    particleHoverFactor={0.3}
+                    particleHoverFactor={0.4}
                     alphaParticles={true}
-                    sizeRandomness={0.6}
-                    cameraDistance={30}
+                    sizeRandomness={0.7}
+                    cameraDistance={35}
                     disableRotation={false}
                     pixelRatio={1}
                 />
             </div>
+
+            {/* Floating Ambient Lights */}
+            <FloatingLights />
 
             <div className="relative z-10">
                 <Header />
@@ -182,6 +188,8 @@ function App() {
                         <Route path="/careers" element={<CareersPage />} />
                         <Route path="/stores" element={<StoreLocatorPage />} />
                         <Route path="/blog" element={<StyleBlogPage />} />
+                        <Route path="/size-guide" element={<SizeGuidePage />} />
+                        <Route path="/email-preferences" element={<EmailPreferencesPage />} />
 
                         {/* 404 Not Found */}
                         <Route path="*" element={<NotFoundPage />} />

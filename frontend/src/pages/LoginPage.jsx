@@ -73,9 +73,9 @@ function LoginPage() {
     ];
 
     return (
-        <div className="min-h-screen flex bg-gray-900">
+        <div className="min-h-screen flex bg-slate-50">
             {/* Left Side - Brand with Image */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900">
+            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-white">
                 {/* Background Image - Clean display */}
                 <img
                     src="/Raymond_Home_page.jpg"
@@ -85,25 +85,28 @@ function LoginPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-gray-900">
+            <div className="flex-1 flex items-center justify-center p-6 lg:p-12 bg-white">
                 <div className="w-full max-w-md">
                     {/* Mobile Logo */}
                     <div className="lg:hidden text-center mb-8">
-                        <Link to="/" className="text-3xl font-heading font-bold text-white">
-                            Raymond
+                        <Link to="/" className="inline-flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#DA2439] to-[#b91d30] rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-lg">R</span>
+                            </div>
+                            <span className="text-2xl font-heading font-bold text-slate-900">Raymond</span>
                         </Link>
                     </div>
 
-                    <div className="bg-gray-800 rounded-2xl shadow-xl p-8 lg:p-10 border border-gray-700">
-                        <h1 className="text-3xl font-heading font-bold text-white mb-2">
+                    <div className="bg-slate-50 rounded-3xl shadow-xl p-8 lg:p-10 border border-slate-100">
+                        <h1 className="text-3xl font-heading font-bold text-slate-900 mb-2">
                             Welcome Back
                         </h1>
-                        <p className="text-gray-400 mb-8">
+                        <p className="text-slate-500 mb-8">
                             Sign in to continue to your account
                         </p>
 
                         {error && (
-                            <div className="mb-6 p-4 bg-red-900/30 border border-red-800 text-red-400 rounded-xl text-sm flex items-center gap-3">
+                            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex items-center gap-3">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -113,7 +116,7 @@ function LoginPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Email Address
                                 </label>
                                 <div className="relative">
@@ -122,17 +125,17 @@ function LoginPage() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="w-full px-5 py-4 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 pl-12"
+                                        className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#DA2439] focus:border-transparent transition-all duration-300 pl-12"
                                         placeholder="you@example.com"
                                     />
-                                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Password
                                 </label>
                                 <div className="relative">
@@ -141,16 +144,16 @@ function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="w-full px-5 py-4 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 pl-12 pr-12"
+                                        className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#DA2439] focus:border-transparent transition-all duration-300 pl-12 pr-12"
                                         placeholder="••••••••"
                                     />
-                                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                     >
                                         {showPassword ? (
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,10 +171,10 @@ function LoginPage() {
 
                             <div className="flex items-center justify-between text-sm">
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-amber-500 focus:ring-amber-500" />
-                                    <span className="text-gray-400">Remember me</span>
+                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 bg-white text-[#DA2439] focus:ring-[#DA2439]" />
+                                    <span className="text-slate-600">Remember me</span>
                                 </label>
-                                <Link to="/forgot-password" className="text-amber-500 hover:text-amber-400 font-medium">
+                                <Link to="/forgot-password" className="text-[#DA2439] hover:text-[#b91d30] font-medium">
                                     Forgot password?
                                 </Link>
                             </div>
@@ -179,7 +182,7 @@ function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg"
+                                className="w-full py-4 bg-[#DA2439] text-white font-semibold rounded-xl hover:bg-[#b91d30] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg"
                             >
                                 {loading ? (
                                     <>
@@ -194,15 +197,15 @@ function LoginPage() {
 
                         {/* Divider */}
                         <div className="flex items-center gap-4 my-8">
-                            <div className="flex-1 h-px bg-gray-700" />
-                            <span className="text-sm text-gray-500">or continue with</span>
-                            <div className="flex-1 h-px bg-gray-700" />
+                            <div className="flex-1 h-px bg-slate-200" />
+                            <span className="text-sm text-slate-400">or continue with</span>
+                            <div className="flex-1 h-px bg-slate-200" />
                         </div>
 
                         {/* Google Sign In */}
                         <a
                             href="/api/auth/google"
-                            className="w-full py-4 bg-white text-gray-800 font-semibold rounded-xl hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg mb-4"
+                            className="w-full py-4 bg-white border-2 border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 flex items-center justify-center gap-3 mb-4"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -213,9 +216,9 @@ function LoginPage() {
                             Sign in with Google
                         </a>
 
-                        <p className="text-center text-gray-400 mt-8">
+                        <p className="text-center text-slate-500 mt-8">
                             Don't have an account?{' '}
-                            <Link to="/register" className="text-amber-500 hover:text-amber-400 font-semibold">
+                            <Link to="/register" className="text-[#DA2439] hover:text-[#b91d30] font-semibold">
                                 Create one
                             </Link>
                         </p>

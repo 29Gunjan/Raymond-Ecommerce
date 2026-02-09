@@ -48,21 +48,21 @@ function ProductCard({ product }) {
         <>
             <Link
                 to={`/products/${product.slug}`}
-                className="group block bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all duration-300"
+                className="group block bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-500 hover:-translate-y-1"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] bg-gray-900 overflow-hidden">
+                <div className="relative aspect-[3/4] bg-slate-50 overflow-hidden">
                     {/* Loading placeholder */}
                     {!imageLoaded && (
-                        <div className="absolute inset-0 bg-gray-800" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-50 animate-pulse" />
                     )}
 
                     <img
                         src={product.images?.[0] || 'https://via.placeholder.com/400x500?text=No+Image'}
                         alt={product.name}
-                        className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'
+                        className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'
                             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                         loading="lazy"
                         onLoad={() => setImageLoaded(true)}
@@ -73,18 +73,18 @@ function ProductCard({ product }) {
                     />
 
                     {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+                    <div className={`absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
                         }`} />
 
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                         {product.isNew && (
-                            <span className="px-3 py-1 bg-amber-500 text-white text-xs font-semibold rounded-full">
+                            <span className="px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-full shadow-lg">
                                 NEW
                             </span>
                         )}
                         {discount > 0 && (
-                            <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">
+                            <span className="px-3 py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full shadow-lg">
                                 -{discount}%
                             </span>
                         )}
@@ -92,15 +92,15 @@ function ProductCard({ product }) {
 
                     {/* Wishlist Button */}
                     <button
-                        className={`absolute top-3 right-3 z-10 w-9 h-9 bg-gray-800/80 rounded-full flex items-center justify-center transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
-                            } hover:bg-red-500 hover:text-white text-gray-300`}
+                        className={`absolute top-3 right-3 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                            } hover:bg-red-50 hover:text-red-500 text-slate-600`}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             // Add to wishlist logic
                         }}
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </button>
@@ -110,7 +110,7 @@ function ProductCard({ product }) {
                         }`}>
                         <button
                             onClick={handleQuickView}
-                            className="w-full py-3 bg-white text-gray-900 font-semibold text-sm rounded-xl hover:bg-amber-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2"
+                            className="w-full py-3.5 bg-white text-slate-900 font-semibold text-sm rounded-xl hover:bg-slate-900 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-xl"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -123,18 +123,18 @@ function ProductCard({ product }) {
 
                 {/* Content */}
                 <div className="p-5">
-                    <p className="text-xs text-amber-500 font-semibold uppercase tracking-wider mb-2">
+                    <p className="text-xs text-[#DA2439] font-semibold uppercase tracking-wider mb-2">
                         {product.category?.name}
                     </p>
-                    <h3 className="font-medium text-white mb-3 line-clamp-2 group-hover:text-amber-400 transition-colors duration-300 text-lg">
+                    <h3 className="font-semibold text-slate-900 mb-3 line-clamp-2 group-hover:text-[#DA2439] transition-colors duration-300 text-lg leading-snug">
                         {product.name}
                     </h3>
                     <div className="flex items-center gap-3">
-                        <span className="text-xl font-bold text-white">
+                        <span className="text-xl font-bold text-slate-900">
                             {formatPrice(product.price)}
                         </span>
                         {product.comparePrice && (
-                            <span className="text-sm text-gray-500 line-through">
+                            <span className="text-sm text-slate-400 line-through">
                                 {formatPrice(product.comparePrice)}
                             </span>
                         )}
@@ -147,7 +147,7 @@ function ProductCard({ product }) {
                                 {[...Array(5)].map((_, i) => (
                                     <svg
                                         key={i}
-                                        className={`w-4 h-4 ${i < Math.round(product.rating) ? 'text-amber-400' : 'text-gray-600'}`}
+                                        className={`w-4 h-4 ${i < Math.round(product.rating) ? 'text-yellow-500' : 'text-slate-200'}`}
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                     >
@@ -155,7 +155,7 @@ function ProductCard({ product }) {
                                     </svg>
                                 ))}
                             </div>
-                            <span className="text-sm text-gray-500">({product.reviewCount || 0})</span>
+                            <span className="text-sm text-slate-500">({product.reviewCount || 0})</span>
                         </div>
                     )}
                 </div>
@@ -164,17 +164,17 @@ function ProductCard({ product }) {
             {/* Quick View Modal */}
             {showQuickView && (
                 <div
-                    className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+                    className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
                     onClick={() => setShowQuickView(false)}
                 >
                     <div
-                        className="bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-700"
+                        className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button */}
                         <button
                             onClick={() => setShowQuickView(false)}
-                            className="absolute top-6 right-6 z-10 w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors text-white"
+                            className="absolute top-6 right-6 z-10 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors text-slate-600 shadow-lg"
                         >
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -183,7 +183,7 @@ function ProductCard({ product }) {
 
                         <div className="grid md:grid-cols-2">
                             {/* Image */}
-                            <div className="aspect-square bg-gray-900 relative overflow-hidden">
+                            <div className="aspect-square bg-slate-50 relative overflow-hidden">
                                 <img
                                     src={product.images?.[0] || 'https://via.placeholder.com/500x500?text=No+Image'}
                                     alt={product.name}
@@ -193,7 +193,7 @@ function ProductCard({ product }) {
                                     }}
                                 />
                                 {discount > 0 && (
-                                    <div className="absolute top-6 left-6 px-4 py-2 bg-red-500 text-white text-sm font-bold rounded-full">
+                                    <div className="absolute top-6 left-6 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-bold rounded-full shadow-lg">
                                         {discount}% OFF
                                     </div>
                                 )}
@@ -201,20 +201,20 @@ function ProductCard({ product }) {
 
                             {/* Details */}
                             <div className="p-8 md:p-10 overflow-y-auto max-h-[600px]">
-                                <p className="text-sm text-amber-500 font-semibold uppercase tracking-wider mb-2">
+                                <p className="text-sm text-[#DA2439] font-semibold uppercase tracking-wider mb-2">
                                     {product.category?.name}
                                 </p>
-                                <h2 className="text-3xl font-bold text-white mb-4 font-heading">
+                                <h2 className="text-3xl font-bold text-slate-900 mb-4 font-heading">
                                     {product.name}
                                 </h2>
 
                                 {/* Price */}
                                 <div className="flex items-center gap-4 mb-6">
-                                    <span className="text-3xl font-bold text-white">
+                                    <span className="text-3xl font-bold text-slate-900">
                                         {formatPrice(product.price)}
                                     </span>
                                     {product.comparePrice && (
-                                        <span className="text-xl text-gray-500 line-through">
+                                        <span className="text-xl text-slate-400 line-through">
                                             {formatPrice(product.comparePrice)}
                                         </span>
                                     )}
@@ -222,7 +222,7 @@ function ProductCard({ product }) {
 
                                 {/* Description */}
                                 {product.description && (
-                                    <p className="text-gray-400 mb-8 line-clamp-3">
+                                    <p className="text-slate-600 mb-8 line-clamp-3 leading-relaxed">
                                         {product.description}
                                     </p>
                                 )}
@@ -230,7 +230,7 @@ function ProductCard({ product }) {
                                 {/* Size Selection */}
                                 {product.variants?.length > 0 && (
                                     <div className="mb-8">
-                                        <label className="block text-sm font-semibold text-white mb-3">
+                                        <label className="block text-sm font-semibold text-slate-900 mb-3">
                                             Select Size
                                         </label>
                                         <div className="flex flex-wrap gap-3">
@@ -240,10 +240,10 @@ function ProductCard({ product }) {
                                                     onClick={() => setSelectedVariant(variant)}
                                                     disabled={variant.stock === 0}
                                                     className={`px-5 py-3 border-2 rounded-xl text-sm font-semibold transition-all duration-300 ${selectedVariant?.id === variant.id
-                                                        ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                                                        ? 'border-[#DA2439] bg-red-50 text-[#DA2439]'
                                                         : variant.stock === 0
-                                                            ? 'border-gray-700 text-gray-600 cursor-not-allowed bg-gray-800'
-                                                            : 'border-gray-600 text-gray-300 hover:border-amber-500/50'
+                                                            ? 'border-slate-200 text-slate-300 cursor-not-allowed bg-slate-50'
+                                                            : 'border-slate-200 text-slate-700 hover:border-[#DA2439]'
                                                         }`}
                                                 >
                                                     {variant.size}
@@ -255,20 +255,20 @@ function ProductCard({ product }) {
 
                                 {/* Quantity */}
                                 <div className="mb-8">
-                                    <label className="block text-sm font-semibold text-white mb-3">
+                                    <label className="block text-sm font-semibold text-slate-900 mb-3">
                                         Quantity
                                     </label>
-                                    <div className="flex items-center gap-1 bg-gray-700 rounded-xl p-1 w-fit">
+                                    <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 w-fit">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-500 transition-all text-lg font-medium text-white"
+                                            className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:bg-slate-50 transition-all text-lg font-medium text-slate-700 shadow-sm"
                                         >
                                             −
                                         </button>
-                                        <span className="w-16 text-center font-semibold text-lg text-white">{quantity}</span>
+                                        <span className="w-16 text-center font-semibold text-lg text-slate-900">{quantity}</span>
                                         <button
                                             onClick={() => setQuantity(quantity + 1)}
-                                            className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-500 transition-all text-lg font-medium text-white"
+                                            className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:bg-slate-50 transition-all text-lg font-medium text-slate-700 shadow-sm"
                                         >
                                             +
                                         </button>
@@ -279,7 +279,7 @@ function ProductCard({ product }) {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={handleAddToCart}
-                                        className="flex-1 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 flex items-center justify-center gap-3"
+                                        className="flex-1 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
                                     >
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -289,7 +289,7 @@ function ProductCard({ product }) {
                                     <Link
                                         to={`/products/${product.slug}`}
                                         onClick={() => setShowQuickView(false)}
-                                        className="px-6 py-4 border-2 border-gray-600 text-gray-300 font-semibold rounded-xl hover:border-gray-500 hover:bg-gray-700 transition-all duration-300"
+                                        className="px-6 py-4 border-2 border-slate-200 text-slate-700 font-semibold rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-all duration-300"
                                     >
                                         Details
                                     </Link>
