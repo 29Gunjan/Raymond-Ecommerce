@@ -70,6 +70,14 @@ export const ordersAPI = {
     cancel: (id) => api.put(`/orders/${id}/cancel`)
 };
 
+// Payment API (Razorpay)
+export const paymentAPI = {
+    getKey: () => api.get('/payment/key'),
+    createOrder: (data) => api.post('/payment/create-order', data),
+    verifyPayment: (data) => api.post('/payment/verify', data),
+    handleFailure: (data) => api.post('/payment/failed', data)
+};
+
 // Reviews API
 export const reviewsAPI = {
     getByProduct: (productId) => api.get(`/reviews/product/${productId}`),

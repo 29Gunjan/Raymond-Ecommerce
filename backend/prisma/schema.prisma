@@ -134,11 +134,17 @@ model Order {
   orderNumber   String        @unique
   status        OrderStatus   @default(PENDING)
   paymentStatus PaymentStatus @default(PENDING)
+  paymentMethod String        @default("COD")
   subtotal      Float
   shipping      Float         @default(0)
   tax           Float         @default(0)
   total         Float
   notes         String?
+  
+  // Razorpay fields
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -151,8 +157,8 @@ model Order {
   items OrderItem[]
 }
 
-  id        String   @id @default(cuid())
 model OrderItem {
+  id        String   @id @default(cuid())
   quantity  Int
   price     Float
   createdAt DateTime @default(now())

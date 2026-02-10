@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { addressesAPI, ordersAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { addressesAPI, ordersAPI, paymentAPI } from '../services/api';
 
 function CheckoutPage() {
     const navigate = useNavigate();
     const { cart, clearCart } = useCart();
+    const { user } = useAuth();
 
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState(null);
-    const [paymentMethod, setPaymentMethod] = useState('COD');
+    const [paymentMethod, setPaymentMethod] = useState('RAZORPAY');
     const [loading, setLoading] = useState(true);
     const [placing, setPlacing] = useState(false);
     const [showAddressForm, setShowAddressForm] = useState(false);
@@ -72,16 +74,97 @@ function CheckoutPage() {
         }
 
         setPlacing(true);
+        
         try {
-            const res = await ordersAPI.create({
-                addressId: selectedAddress,
-                paymentMethod
-            });
-            await clearCart();
-            navigate(`/orders/${res.data.id}`, { state: { orderPlaced: true } });
+            if (paymentMethod === 'RAZORPAY') {
+                // Get Razorpay key
+                const keyRes = await paymentAPI.getKey();
+                const razorpayKey = keyRes.data.key;
+
+                // Create Razorpay order
+                const orderRes = await paymentAPI.createOrder({
+                    addressId: selectedAddress
+                });
+
+                const { orderId, amount, currency } = orderRes.data;
+
+                // Get selected address details
+                const selectedAddr = addresses.find(a => a.id === selectedAddress);
+
+                // Initialize Razorpay checkout
+                const options = {
+                    key: razorpayKey,
+                    amount: amount,
+                    currency: currency,
+                    name: 'Raymond Store',
+                    description: 'Premium Fashion Purchase',
+                    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Raymond_logo.svg/200px-Raymond_logo.svg.png',
+                    order_id: orderId,
+                    handler: async function (response) {
+                        try {
+                            // Verify payment on backend
+                            const verifyRes = await paymentAPI.verifyPayment({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                addressId: selectedAddress
+                            });
+
+                            if (verifyRes.data.success) {
+                                await clearCart();
+                                navigate(`/orders/${verifyRes.data.order.id}`, { 
+                                    state: { orderPlaced: true } 
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Payment verification failed:', error);
+                            alert('Payment verification failed. Please contact support.');
+                        }
+                    },
+                    prefill: {
+                        name: user?.name || selectedAddr?.name || '',
+                        email: user?.email || '',
+                        contact: user?.phone || selectedAddr?.phone || ''
+                    },
+                    notes: {
+                        address: selectedAddr ? 
+                            `${selectedAddr.street}, ${selectedAddr.city}, ${selectedAddr.state} - ${selectedAddr.pincode}` : ''
+                    },
+                    theme: {
+                        color: '#1e293b'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            setPlacing(false);
+                        }
+                    }
+                };
+
+                const razorpay = new window.Razorpay(options);
+                
+                razorpay.on('payment.failed', async function (response) {
+                    await paymentAPI.handleFailure({
+                        razorpay_order_id: response.error.metadata.order_id,
+                        error_code: response.error.code,
+                        error_description: response.error.description
+                    });
+                    alert(`Payment failed: ${response.error.description}`);
+                    setPlacing(false);
+                });
+
+                razorpay.open();
+            } else {
+                // Cash on Delivery
+                const res = await ordersAPI.create({
+                    addressId: selectedAddress,
+                    paymentMethod: 'COD'
+                });
+                await clearCart();
+                navigate(`/orders/${res.data.id}`, { state: { orderPlaced: true } });
+            }
         } catch (error) {
+            console.error('Order error:', error);
             alert('Failed to place order: ' + (error.response?.data?.error || 'Unknown error'));
-        } finally {
             setPlacing(false);
         }
     };
@@ -251,23 +334,17 @@ function CheckoutPage() {
                             <div className="space-y-3">
                                 {[
                                     {
-                                        id: 'COD', label: 'Cash on Delivery', desc: 'Pay when you receive', icon: (
+                                        id: 'RAZORPAY', label: 'Pay Online', desc: 'UPI, Cards, Net Banking, Wallets', icon: (
+                                            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                            </svg>
+                                        ),
+                                        recommended: true
+                                    },
+                                    {
+                                        id: 'COD', label: 'Cash on Delivery', desc: 'Pay when you receive (+₹49 handling)', icon: (
                                             <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
-                                        )
-                                    },
-                                    {
-                                        id: 'UPI', label: 'UPI', desc: 'Google Pay, PhonePe, Paytm', icon: (
-                                            <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                            </svg>
-                                        )
-                                    },
-                                    {
-                                        id: 'CARD', label: 'Credit/Debit Card', desc: 'Visa, Mastercard, RuPay', icon: (
-                                            <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                             </svg>
                                         )
                                     }
@@ -285,8 +362,13 @@ function CheckoutPage() {
                                             className="w-5 h-5 text-[#DA2439] bg-white border-slate-300 focus:ring-[#DA2439]"
                                         />
                                         <span className="flex-shrink-0">{method.icon}</span>
-                                        <div>
-                                            <p className="font-semibold text-slate-900">{method.label}</p>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-semibold text-slate-900">{method.label}</p>
+                                                {method.recommended && (
+                                                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Recommended</span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-slate-500">{method.desc}</p>
                                         </div>
                                     </label>
@@ -347,14 +429,25 @@ function CheckoutPage() {
                                 {placing ? (
                                     <>
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Placing Order...
+                                        {paymentMethod === 'RAZORPAY' ? 'Processing...' : 'Placing Order...'}
                                     </>
                                 ) : (
                                     <>
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Place Order
+                                        {paymentMethod === 'RAZORPAY' ? (
+                                            <>
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                                Pay {formatPrice(total)}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Place Order (COD)
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </button>
