@@ -128,7 +128,19 @@ export const adminAPI = {
     getCategories: () => api.get('/categories'),
     createCategory: (data) => api.post('/admin/categories', data),
     updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
-    deleteCategory: (id) => api.delete(`/admin/categories/${id}`)
+    deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
+
+    // Returns
+    getReturns: (params) => api.get('/admin/returns', { params }),
+    getReturn: (id) => api.get(`/admin/returns/${id}`),
+    updateReturnStatus: (id, data) => api.put(`/admin/returns/${id}/status`, data)
+};
+
+// Returns API
+export const returnsAPI = {
+    create: (data) => api.post('/returns', data),
+    getAll: () => api.get('/returns'),
+    getById: (id) => api.get(`/returns/${id}`)
 };
 
 export default api;

@@ -28,6 +28,15 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PICKED_UP
+  RECEIVED
+  REFUNDED
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
@@ -48,6 +57,7 @@ model User {
   reviews   Review[]
   cart      Cart?
   wishlist  Wishlist?
+  returns   ReturnRequest[]
 }
 
 model Category {
@@ -83,6 +93,7 @@ model Product {
   cartItems  CartItem[]
   orderItems OrderItem[]
   wishlists  WishlistItem[]
+  returnItems ReturnItem[]
 }
 
 model ProductVariant {
@@ -159,7 +170,8 @@ model Order {
   addressId String
   address   Address @relation(fields: [addressId], references: [id])
 
-  items OrderItem[]
+  items   OrderItem[]
+  returns ReturnRequest[]
 }
 
 model OrderItem {
@@ -176,6 +188,8 @@ model OrderItem {
 
   variantId String
   variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  returnItems ReturnItem[]
 }
 
 model Review {
@@ -238,4 +252,40 @@ model WishlistItem {
   createdAt DateTime @default(now())
 
   @@unique([wishlistId, productId])
+}
+
+model ReturnRequest {
+  id            String       @id @default(cuid())
+  returnNumber  String       @unique
+  reason        String
+  description   String?
+  status        ReturnStatus @default(REQUESTED)
+  refundAmount  Float
+  refundMethod  String       @default("ORIGINAL")
+  adminNotes    String?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  orderId       String
+  order         Order        @relation(fields: [orderId], references: [id])
+
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+
+  items         ReturnItem[]
+}
+
+model ReturnItem {
+  id            String        @id @default(cuid())
+  quantity      Int
+
+  returnId      String
+  return        ReturnRequest @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  orderItemId   String
+  orderItem     OrderItem     @relation(fields: [orderItemId], references: [id])
+
+  productId     String
+  product       Product       @relation(fields: [productId], references: [id])
 }

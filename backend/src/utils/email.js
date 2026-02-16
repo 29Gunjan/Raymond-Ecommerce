@@ -460,6 +460,132 @@ const emailTemplates = {
                 </html>
             `
         };
+    },
+    // Return Request Confirmation Email
+    returnRequested: (returnRequest, user) => {
+        const itemsList = returnRequest.items.map(item => `
+            <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                    ${item.orderItem.product.name} (${item.orderItem.variant.size} / ${item.orderItem.variant.color})
+                </td>
+                <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">
+                    ${item.quantity}
+                </td>
+            </tr>
+        `).join('');
+
+        return {
+            subject: `Return Request ${returnRequest.returnNumber} — Raymond Store`,
+            html: `
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff;">
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px; text-align: center;">
+                        <h1 style="color: #e8d5b7; margin: 0; font-size: 28px; letter-spacing: 2px;">RAYMOND</h1>
+                        <p style="color: #ccc; margin: 5px 0 0; font-size: 12px; letter-spacing: 3px;">RETURN REQUEST RECEIVED</p>
+                    </div>
+                    <div style="padding: 30px;">
+                        <p style="color: #333;">Dear ${user.name},</p>
+                        <p style="color: #555;">We have received your return request. Here are the details:</p>
+                        
+                        <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Return Number:</strong> ${returnRequest.returnNumber}</p>
+                            <p style="margin: 5px 0;"><strong>Order:</strong> ${returnRequest.order.orderNumber}</p>
+                            <p style="margin: 5px 0;"><strong>Reason:</strong> ${returnRequest.reason}</p>
+                            <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #f0ad4e;">Requested</span></p>
+                            <p style="margin: 5px 0;"><strong>Refund Amount:</strong> ₹${returnRequest.refundAmount.toLocaleString('en-IN')}</p>
+                        </div>
+
+                        <h3 style="color: #1a1a2e; border-bottom: 2px solid #e8d5b7; padding-bottom: 8px;">Items to Return</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px; text-align: left;">Product</th>
+                                    <th style="padding: 12px; text-align: center;">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsList}
+                            </tbody>
+                        </table>
+
+                        <p style="color: #555; margin-top: 20px;">Our team will review your request within 2-3 business days. You will receive an email once the request is processed.</p>
+                    </div>
+                    <div style="background: #1a1a2e; padding: 20px; text-align: center;">
+                        <p style="color: #888; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} Raymond Store. All rights reserved.</p>
+                    </div>
+                </div>
+            `
+        };
+    },
+
+    // Return Status Update Email
+    returnStatusUpdate: (returnRequest, user, newStatus) => {
+        const statusMessages = {
+            'APPROVED': {
+                color: '#28a745',
+                label: 'Approved',
+                message: 'Your return request has been approved. Please pack the items securely and our pickup agent will contact you soon.'
+            },
+            'REJECTED': {
+                color: '#dc3545',
+                label: 'Rejected',
+                message: `Your return request has been rejected.${returnRequest.adminNotes ? ' Reason: ' + returnRequest.adminNotes : ''}`
+            },
+            'PICKED_UP': {
+                color: '#17a2b8',
+                label: 'Picked Up',
+                message: 'Your return items have been picked up. We will inspect them and process your refund.'
+            },
+            'RECEIVED': {
+                color: '#6f42c1',
+                label: 'Received',
+                message: 'We have received your returned items and are inspecting them. Refund will be processed shortly.'
+            },
+            'REFUNDED': {
+                color: '#28a745',
+                label: 'Refunded',
+                message: `Your refund of ₹${returnRequest.refundAmount.toLocaleString('en-IN')} has been processed. It will reflect in your account within 5-7 business days.`
+            }
+        };
+
+        const statusInfo = statusMessages[newStatus] || { color: '#555', label: newStatus, message: '' };
+
+        return {
+            subject: `Return ${returnRequest.returnNumber} — ${statusInfo.label} — Raymond Store`,
+            html: `
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff;">
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px; text-align: center;">
+                        <h1 style="color: #e8d5b7; margin: 0; font-size: 28px; letter-spacing: 2px;">RAYMOND</h1>
+                        <p style="color: #ccc; margin: 5px 0 0; font-size: 12px; letter-spacing: 3px;">RETURN UPDATE</p>
+                    </div>
+                    <div style="padding: 30px;">
+                        <p style="color: #333;">Dear ${user.name},</p>
+                        
+                        <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                            <p style="margin: 0 0 10px; color: #888; font-size: 14px;">Return ${returnRequest.returnNumber}</p>
+                            <h2 style="margin: 0; color: ${statusInfo.color}; font-size: 24px;">${statusInfo.label}</h2>
+                        </div>
+
+                        <p style="color: #555; line-height: 1.6;">${statusInfo.message}</p>
+
+                        ${returnRequest.adminNotes && newStatus !== 'REJECTED' ? `
+                            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 20px 0; border-radius: 0 4px 4px 0;">
+                                <strong>Note from our team:</strong> ${returnRequest.adminNotes}
+                            </div>
+                        ` : ''}
+
+                        <div style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                            <p style="margin: 5px 0;"><strong>Order:</strong> ${returnRequest.order.orderNumber}</p>
+                            <p style="margin: 5px 0;"><strong>Refund Amount:</strong> ₹${returnRequest.refundAmount.toLocaleString('en-IN')}</p>
+                        </div>
+
+                        <p style="color: #888; font-size: 13px;">If you have any questions, please contact our support team.</p>
+                    </div>
+                    <div style="background: #1a1a2e; padding: 20px; text-align: center;">
+                        <p style="color: #888; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} Raymond Store. All rights reserved.</p>
+                    </div>
+                </div>
+            `
+        };
     }
 };
 

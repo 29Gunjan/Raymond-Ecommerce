@@ -14,6 +14,7 @@ const wishlistRoutes = require('./routes/wishlist.routes');
 const addressRoutes = require('./routes/address.routes');
 const adminRoutes = require('./routes/admin.routes');
 const paymentRoutes = require('./routes/payment.routes');
+const returnRoutes = require('./routes/return.routes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/returns', returnRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

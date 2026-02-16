@@ -403,4 +403,203 @@ router.put('/users/:id/role', async (req, res) => {
     }
 });
 
+// Returns management
+router.get('/returns', async (req, res) => {
+    try {
+        const { page = 1, limit = 20, status } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const where = status ? { status } : {};
+
+        const [returns, total] = await Promise.all([
+            prisma.returnRequest.findMany({
+                where,
+                include: {
+                    user: { select: { id: true, name: true, email: true } },
+                    order: {
+                        select: {
+                            id: true,
+                            orderNumber: true,
+                            total: true,
+                            paymentMethod: true,
+                            paymentStatus: true
+                        }
+                    },
+                    items: {
+                        include: {
+                            orderItem: {
+                                include: {
+                                    product: { select: { name: true, images: true } },
+                                    variant: true
+                                }
+                            }
+                        }
+                    }
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: parseInt(limit)
+            }),
+            prisma.returnRequest.count({ where })
+        ]);
+
+        res.json({
+            returns,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                pages: Math.ceil(total / parseInt(limit))
+            }
+        });
+    } catch (error) {
+        console.error('Get returns error:', error);
+        res.status(500).json({ error: 'Failed to fetch returns' });
+    }
+});
+
+router.get('/returns/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const returnRequest = await prisma.returnRequest.findUnique({
+            where: { id },
+            include: {
+                user: { select: { id: true, name: true, email: true, phone: true } },
+                order: {
+                    include: {
+                        address: true,
+                        items: {
+                            include: {
+                                product: { select: { id: true, name: true, images: true } },
+                                variant: true
+                            }
+                        }
+                    }
+                },
+                items: {
+                    include: {
+                        orderItem: {
+                            include: {
+                                product: { select: { id: true, name: true, slug: true, images: true } },
+                                variant: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!returnRequest) {
+            return res.status(404).json({ error: 'Return request not found' });
+        }
+
+        res.json(returnRequest);
+    } catch (error) {
+        console.error('Get return detail error:', error);
+        res.status(500).json({ error: 'Failed to fetch return details' });
+    }
+});
+
+router.put('/returns/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, adminNotes } = req.body;
+
+        const validStatuses = ['APPROVED', 'REJECTED', 'PICKED_UP', 'RECEIVED', 'REFUNDED'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+            });
+        }
+
+        const returnRequest = await prisma.returnRequest.findUnique({
+            where: { id },
+            include: {
+                items: {
+                    include: {
+                        orderItem: true
+                    }
+                },
+                order: true,
+                user: { select: { id: true, email: true, name: true } }
+            }
+        });
+
+        if (!returnRequest) {
+            return res.status(404).json({ error: 'Return request not found' });
+        }
+
+        // If marking as REFUNDED, restore stock for returned items
+        if (status === 'REFUNDED') {
+            for (const item of returnRequest.items) {
+                await prisma.productVariant.update({
+                    where: { id: item.orderItem.variantId },
+                    data: {
+                        stock: {
+                            increment: item.quantity
+                        }
+                    }
+                });
+            }
+
+            // Check if full refund (refund amount equals order total)
+            if (returnRequest.refundAmount >= returnRequest.order.total) {
+                await prisma.order.update({
+                    where: { id: returnRequest.orderId },
+                    data: { paymentStatus: 'REFUNDED' }
+                });
+            }
+        }
+
+        // Update return request status
+        const updatedReturn = await prisma.returnRequest.update({
+            where: { id },
+            data: {
+                status,
+                ...(adminNotes && { adminNotes })
+            },
+            include: {
+                items: {
+                    include: {
+                        orderItem: {
+                            include: {
+                                product: { select: { id: true, name: true, images: true } },
+                                variant: true
+                            }
+                        }
+                    }
+                },
+                order: {
+                    select: {
+                        orderNumber: true,
+                        total: true,
+                        paymentMethod: true,
+                        paymentStatus: true
+                    }
+                },
+                user: { select: { id: true, name: true, email: true } }
+            }
+        });
+
+        // Send status update email
+        try {
+            const { sendEmail, emailTemplates } = require('../utils/email');
+            const emailContent = emailTemplates.returnStatusUpdate(updatedReturn, updatedReturn.user, status);
+            await sendEmail({
+                to: updatedReturn.user.email,
+                subject: emailContent.subject,
+                html: emailContent.html
+            });
+        } catch (emailError) {
+            console.error('Failed to send return status email:', emailError);
+        }
+
+        res.json(updatedReturn);
+    } catch (error) {
+        console.error('Update return status error:', error);
+        res.status(500).json({ error: 'Failed to update return status' });
+    }
+});
+
 module.exports = router;
