@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../utils/prisma');
 const { authenticate } = require('../middleware/auth.middleware');
+const { sendEmail, emailTemplates } = require('../utils/email');
 
 const router = express.Router();
 
@@ -10,6 +11,11 @@ const generateOrderNumber = () => {
     const timestamp = Date.now().toString(36).toUpperCase();
     const random = Math.random().toString(36).substring(2, 6).toUpperCase();
     return `${prefix}-${timestamp}-${random}`;
+};
+
+// Generate 6-digit OTP
+const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
 // Track order by order number (public - no auth required)
@@ -296,10 +302,76 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// Cancel order
+// Request cancellation OTP
+router.post('/:id/request-cancel-otp', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const order = await prisma.order.findFirst({
+            where: {
+                id,
+                userId: req.user.id
+            }
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        if (!['PENDING', 'CONFIRMED'].includes(order.status)) {
+            return res.status(400).json({ error: 'Order cannot be cancelled at this stage' });
+        }
+
+        // Get user email
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { email: true, name: true }
+        });
+
+        // Generate OTP and set expiry (10 minutes)
+        const otp = generateOtp();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+        // Save OTP to order
+        await prisma.order.update({
+            where: { id },
+            data: {
+                cancelOtp: otp,
+                cancelOtpExpiry: otpExpiry
+            }
+        });
+
+        // Send OTP email
+        const emailContent = emailTemplates.cancelOtp(order, user, otp);
+        await sendEmail({
+            to: user.email,
+            subject: emailContent.subject,
+            html: emailContent.html
+        });
+
+        res.json({ 
+            message: 'OTP sent to your registered email',
+            email: user.email.replace(/(.{2})(.*)(@.*)/, '$1****$3') // Mask email
+        });
+    } catch (error) {
+        console.error('Request cancel OTP error:', error);
+        res.status(500).json({ error: 'Failed to send OTP' });
+    }
+});
+
+// Cancel order with OTP verification
 router.put('/:id/cancel', authenticate, async (req, res) => {
     try {
         const { id } = req.params;
+        const { otp, reason } = req.body;
+
+        if (!otp) {
+            return res.status(400).json({ error: 'OTP is required' });
+        }
+
+        if (!reason) {
+            return res.status(400).json({ error: 'Cancellation reason is required' });
+        }
 
         const order = await prisma.order.findFirst({
             where: {
@@ -317,6 +389,15 @@ router.put('/:id/cancel', authenticate, async (req, res) => {
             return res.status(400).json({ error: 'Order cannot be cancelled' });
         }
 
+        // Verify OTP
+        if (!order.cancelOtp || order.cancelOtp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
+
+        if (!order.cancelOtpExpiry || new Date() > new Date(order.cancelOtpExpiry)) {
+            return res.status(400).json({ error: 'OTP has expired. Please request a new one.' });
+        }
+
         // Restore stock
         for (const item of order.items) {
             await prisma.productVariant.update({
@@ -332,7 +413,12 @@ router.put('/:id/cancel', authenticate, async (req, res) => {
         // Update order status
         const updatedOrder = await prisma.order.update({
             where: { id },
-            data: { status: 'CANCELLED' },
+            data: { 
+                status: 'CANCELLED',
+                cancelReason: reason,
+                cancelOtp: null,
+                cancelOtpExpiry: null
+            },
             include: {
                 items: {
                     include: {
@@ -350,6 +436,23 @@ router.put('/:id/cancel', authenticate, async (req, res) => {
                 address: true
             }
         });
+
+        // Send cancellation confirmation email
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: req.user.id },
+                select: { email: true, name: true }
+            });
+
+            const emailContent = emailTemplates.orderCancelled(updatedOrder, user, reason);
+            await sendEmail({
+                to: user.email,
+                subject: emailContent.subject,
+                html: emailContent.html
+            });
+        } catch (emailError) {
+            console.error('Failed to send cancellation email:', emailError);
+        }
 
         res.json(updatedOrder);
     } catch (error) {

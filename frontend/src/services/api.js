@@ -67,7 +67,8 @@ export const ordersAPI = {
     getAll: () => api.get('/orders'),
     getById: (id) => api.get(`/orders/${id}`),
     create: (data) => api.post('/orders', data),
-    cancel: (id) => api.put(`/orders/${id}/cancel`)
+    requestCancelOtp: (id) => api.post(`/orders/${id}/request-cancel-otp`),
+    cancel: (id, data) => api.put(`/orders/${id}/cancel`, data)
 };
 
 // Payment API (Razorpay)

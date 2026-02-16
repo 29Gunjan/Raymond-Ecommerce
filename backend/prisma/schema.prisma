@@ -145,6 +145,11 @@ model Order {
   razorpayOrderId   String?
   razorpayPaymentId String?
   
+  // Cancellation fields
+  cancelReason      String?
+  cancelOtp         String?
+  cancelOtpExpiry   DateTime?
+  
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

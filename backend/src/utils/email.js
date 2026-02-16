@@ -334,6 +334,132 @@ const emailTemplates = {
                 </html>
             `
         };
+    },
+
+    // Cancel OTP Email
+    cancelOtp: (order, user, otp) => {
+        return {
+            subject: `OTP for Order Cancellation - #${order.orderNumber}`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
+                        .content { background: #fff; padding: 30px; border: 1px solid #eee; }
+                        .footer { background: #1a1a2e; color: #aaa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; }
+                        .otp-box { background: #f8f9fa; padding: 25px; border-radius: 8px; text-align: center; margin: 25px 0; border: 2px dashed #d4af37; }
+                        .otp-code { font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1a1a2e; margin: 0; }
+                        .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Raymond</h1>
+                            <p style="margin: 5px 0 0; opacity: 0.9;">Order Cancellation Verification</p>
+                        </div>
+                        <div class="content">
+                            <h2>🔐 Verify Your Cancellation Request</h2>
+                            <p>Hi ${user.name || 'Valued Customer'},</p>
+                            <p>You have requested to cancel your order <strong>#${order.orderNumber}</strong>. Please use the OTP below to confirm your cancellation:</p>
+                            
+                            <div class="otp-box">
+                                <p style="margin: 0 0 10px; color: #666;">Your OTP Code</p>
+                                <p class="otp-code">${otp}</p>
+                            </div>
+
+                            <div class="warning">
+                                <strong>⚠️ Important:</strong>
+                                <ul style="margin: 10px 0 0; padding-left: 20px;">
+                                    <li>This OTP is valid for <strong>10 minutes</strong></li>
+                                    <li>Do not share this OTP with anyone</li>
+                                    <li>If you didn't request this, please ignore this email</li>
+                                </ul>
+                            </div>
+
+                            <p style="color: #666; font-size: 14px;">
+                                If you did not request this cancellation, your order will remain active and no action is required.
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p style="margin: 0;">Raymond Store</p>
+                            <p style="margin: 5px 0 0; font-size: 12px;">This is an automated email. Please do not reply.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+    },
+
+    // Order Cancelled Confirmation Email
+    orderCancelled: (order, user, reason) => {
+        return {
+            subject: `Order Cancelled - #${order.orderNumber}`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
+                        .content { background: #fff; padding: 30px; border: 1px solid #eee; }
+                        .footer { background: #1a1a2e; color: #aaa; padding: 20px; text-align: center; border-radius: 0 0 12px 12px; }
+                        .cancelled-box { background: #fee2e2; border: 1px solid #ef4444; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; }
+                        .reason-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .btn { display: inline-block; background: #d4af37; color: #000; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Raymond</h1>
+                            <p style="margin: 5px 0 0; opacity: 0.9;">Order Cancellation Confirmed</p>
+                        </div>
+                        <div class="content">
+                            <h2>Order Cancelled Successfully</h2>
+                            <p>Hi ${user.name || 'Valued Customer'},</p>
+                            
+                            <div class="cancelled-box">
+                                <p style="font-size: 18px; margin: 0; font-weight: bold; color: #ef4444;">
+                                    ❌ Order #${order.orderNumber} has been cancelled
+                                </p>
+                            </div>
+
+                            <div class="reason-box">
+                                <p style="margin: 0; font-weight: bold;">Reason for Cancellation:</p>
+                                <p style="margin: 5px 0 0;">${reason}</p>
+                            </div>
+
+                            <p><strong>Order Total:</strong> ₹${order.total.toLocaleString('en-IN')}</p>
+                            
+                            ${order.paymentStatus === 'PAID' ? `
+                            <p style="color: #16a34a; font-weight: bold;">
+                                💰 Refund will be processed within 5-7 business days to your original payment method.
+                            </p>
+                            ` : ''}
+
+                            <p style="margin-top: 25px;">We're sorry to see this order cancelled. If you have any questions or concerns, please don't hesitate to reach out to our customer support.</p>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${process.env.FRONTEND_URL}/products" class="btn">Continue Shopping</a>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <p style="margin: 0;">Raymond Store</p>
+                            <p style="margin: 5px 0 0; font-size: 12px;">Questions? Contact us at support@raymond.com</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
     }
 };
 
