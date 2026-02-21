@@ -17,6 +17,8 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import WishlistPage from './pages/WishlistPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
+import MyReturnsPage from './pages/MyReturnsPage';
+import ReturnDetailPage from './pages/ReturnDetailPage';
 
 // Support & Company Pages
 import TrackOrderPage from './pages/TrackOrderPage';
@@ -39,6 +41,7 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCategories from './pages/admin/AdminCategories';
+import AdminReturns from './pages/admin/AdminReturns';
 
 // Admin Route Wrapper
 function AdminRoute({ children }) {
@@ -133,6 +136,22 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+                        <Route
+                            path="/my-returns"
+                            element={
+                                <ProtectedRoute>
+                                    <MyReturnsPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/my-returns/:id"
+                            element={
+                                <ProtectedRoute>
+                                    <ReturnDetailPage />
+                                </ProtectedRoute>
+                            }
+                        />
 
                         {/* Admin Routes */}
                         <Route
@@ -172,6 +191,14 @@ function App() {
                             element={
                                 <AdminRoute>
                                     <AdminCategories />
+                                </AdminRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/returns"
+                            element={
+                                <AdminRoute>
+                                    <AdminReturns />
                                 </AdminRoute>
                             }
                         />
