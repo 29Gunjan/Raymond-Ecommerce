@@ -1,0 +1,22 @@
+/* Admin Returns */
+.admin-returns-notes {
+    width: 100%;
+    min-height: 80px;
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.admin-returns-notes:focus {
+    border-color: #f59e0b;
+}
+
+.admin-returns-notes::placeholder {
+    color: #6b7280;
+}

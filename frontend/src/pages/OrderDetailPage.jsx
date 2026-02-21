@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ordersAPI } from '../services/api';
+import { ordersAPI, returnsAPI } from '../services/api';
 
 // Cancellation reasons like Flipkart
 const CANCEL_REASONS = [
@@ -13,11 +13,22 @@ const CANCEL_REASONS = [
     { id: 'other', label: 'Other reason', description: 'My reason is not listed above' }
 ];
 
+// Return reasons
+const RETURN_REASONS = [
+    { id: 'defective', label: 'Product is defective/damaged', description: 'The product arrived damaged or has defects' },
+    { id: 'wrong_item', label: 'Wrong item received', description: 'I received a different product than what I ordered' },
+    { id: 'not_as_described', label: 'Not as described', description: 'The product does not match the description' },
+    { id: 'size_issue', label: 'Size/fit issue', description: 'The size or fit is not right for me' },
+    { id: 'quality', label: 'Quality not satisfactory', description: 'The quality does not meet my expectations' },
+    { id: 'changed_mind', label: 'Changed my mind', description: 'I no longer need this product' },
+    { id: 'other', label: 'Other reason', description: 'My reason is not listed above' }
+];
+
 function OrderDetailPage() {
     const { id } = useParams();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     // Cancellation modal state
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [cancelStep, setCancelStep] = useState(1); // 1: Select reason, 2: Enter OTP
@@ -28,6 +39,16 @@ function OrderDetailPage() {
     const [cancelLoading, setCancelLoading] = useState(false);
     const [cancelError, setCancelError] = useState('');
     const [otpSent, setOtpSent] = useState(false);
+
+    // Return modal state
+    const [showReturnModal, setShowReturnModal] = useState(false);
+    const [returnReason, setReturnReason] = useState('');
+    const [returnOtherReason, setReturnOtherReason] = useState('');
+    const [returnDescription, setReturnDescription] = useState('');
+    const [returnItems, setReturnItems] = useState({});
+    const [returnLoading, setReturnLoading] = useState(false);
+    const [returnError, setReturnError] = useState('');
+    const [returnSuccess, setReturnSuccess] = useState(false);
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -119,8 +140,8 @@ function OrderDetailPage() {
         setCancelLoading(true);
         setCancelError('');
 
-        const reason = selectedReason === 'other' 
-            ? otherReason 
+        const reason = selectedReason === 'other'
+            ? otherReason
             : CANCEL_REASONS.find(r => r.id === selectedReason)?.label || selectedReason;
 
         try {
@@ -148,6 +169,94 @@ function OrderDetailPage() {
             setCancelError(error.response?.data?.error || 'Failed to resend OTP');
         } finally {
             setCancelLoading(false);
+        }
+    };
+
+    // Return modal handlers
+    const openReturnModal = () => {
+        setShowReturnModal(true);
+        setReturnReason('');
+        setReturnOtherReason('');
+        setReturnDescription('');
+        setReturnItems({});
+        setReturnError('');
+        setReturnSuccess(false);
+    };
+
+    const closeReturnModal = () => {
+        setShowReturnModal(false);
+        setReturnReason('');
+        setReturnOtherReason('');
+        setReturnDescription('');
+        setReturnItems({});
+        setReturnError('');
+    };
+
+    const toggleReturnItem = (itemId) => {
+        setReturnItems(prev => {
+            if (prev[itemId]) {
+                const next = { ...prev };
+                delete next[itemId];
+                return next;
+            }
+            const orderItem = order.items.find(i => i.id === itemId);
+            return { ...prev, [itemId]: orderItem?.quantity || 1 };
+        });
+    };
+
+    const updateReturnItemQty = (itemId, qty) => {
+        const orderItem = order.items.find(i => i.id === itemId);
+        const maxQty = orderItem?.quantity || 1;
+        const newQty = Math.max(1, Math.min(qty, maxQty));
+        setReturnItems(prev => ({ ...prev, [itemId]: newQty }));
+    };
+
+    const getRefundPreview = () => {
+        let total = 0;
+        for (const [itemId, qty] of Object.entries(returnItems)) {
+            const orderItem = order.items.find(i => i.id === itemId);
+            if (orderItem) total += orderItem.price * qty;
+        }
+        return Math.round(total * 100) / 100;
+    };
+
+    const handleSubmitReturn = async () => {
+        if (!returnReason) {
+            setReturnError('Please select a reason for return');
+            return;
+        }
+        if (returnReason === 'other' && !returnOtherReason.trim()) {
+            setReturnError('Please specify your reason');
+            return;
+        }
+        const selectedItems = Object.entries(returnItems).filter(([, qty]) => qty > 0);
+        if (selectedItems.length === 0) {
+            setReturnError('Please select at least one item to return');
+            return;
+        }
+
+        setReturnLoading(true);
+        setReturnError('');
+
+        const reason = returnReason === 'other'
+            ? returnOtherReason
+            : RETURN_REASONS.find(r => r.id === returnReason)?.label || returnReason;
+
+        try {
+            await returnsAPI.create({
+                orderId: order.id,
+                reason,
+                description: returnDescription || undefined,
+                items: selectedItems.map(([orderItemId, quantity]) => ({
+                    orderItemId,
+                    quantity
+                }))
+            });
+            setReturnSuccess(true);
+        } catch (error) {
+            setReturnError(error.response?.data?.error || 'Failed to create return request');
+        } finally {
+            setReturnLoading(false);
         }
     };
 
@@ -214,11 +323,18 @@ function OrderDetailPage() {
                                         </p>
                                     )}
                                 </div>
-                                {['PENDING', 'CONFIRMED'].includes(order.status) && (
-                                    <button onClick={openCancelModal} className="btn bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20">
-                                        Cancel Order
-                                    </button>
-                                )}
+                                <div className="flex gap-2">
+                                    {['PENDING', 'CONFIRMED'].includes(order.status) && (
+                                        <button onClick={openCancelModal} className="btn bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20">
+                                            Cancel Order
+                                        </button>
+                                    )}
+                                    {order.status === 'DELIVERED' && !order.returns?.some(r => r.status !== 'REJECTED') && (
+                                        <button onClick={openReturnModal} className="btn bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20">
+                                            Request Return
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -322,7 +438,7 @@ function OrderDetailPage() {
                             <h2 className="text-xl font-semibold text-white">
                                 {cancelStep === 1 ? 'Cancel Order' : 'Verify OTP'}
                             </h2>
-                            <button 
+                            <button
                                 onClick={closeCancelModal}
                                 className="text-gray-400 hover:text-white transition-colors"
                             >
@@ -342,13 +458,12 @@ function OrderDetailPage() {
                                     </p>
                                     <div className="space-y-3">
                                         {CANCEL_REASONS.map(reason => (
-                                            <label 
+                                            <label
                                                 key={reason.id}
-                                                className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                                                    selectedReason === reason.id 
-                                                        ? 'border-[#DA2439] bg-[#DA2439]/10' 
+                                                className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${selectedReason === reason.id
+                                                        ? 'border-[#DA2439] bg-[#DA2439]/10'
                                                         : 'border-gray-700 hover:border-gray-600 bg-gray-900/50'
-                                                }`}
+                                                    }`}
                                             >
                                                 <input
                                                     type="radio"
@@ -437,7 +552,7 @@ function OrderDetailPage() {
 
                                     <p className="text-center text-sm text-gray-400 mb-4">
                                         Didn't receive the code?{' '}
-                                        <button 
+                                        <button
                                             onClick={handleResendOtp}
                                             disabled={cancelLoading}
                                             className="text-[#DA2439] hover:underline disabled:opacity-50"
@@ -477,6 +592,199 @@ function OrderDetailPage() {
                                     <p className="text-gray-500 text-xs text-center mt-4">
                                         OTP is valid for 10 minutes
                                     </p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Return Request Modal */}
+            {showReturnModal && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#12121a] rounded-xl border border-gray-800 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        {/* Modal Header */}
+                        <div className="flex justify-between items-center p-6 border-b border-gray-800">
+                            <h2 className="text-xl font-semibold text-white">
+                                {returnSuccess ? 'Return Requested!' : 'Request Return'}
+                            </h2>
+                            <button
+                                onClick={closeReturnModal}
+                                className="text-gray-400 hover:text-white transition-colors"
+                            >
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6">
+                            {returnSuccess ? (
+                                <div className="text-center py-4">
+                                    <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-white font-medium mb-2">Return request submitted successfully!</p>
+                                    <p className="text-gray-400 text-sm mb-6">You'll receive an email confirmation shortly.</p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={closeReturnModal}
+                                            className="flex-1 btn bg-gray-800 text-white border border-gray-700 hover:bg-gray-700"
+                                        >
+                                            Close
+                                        </button>
+                                        <Link
+                                            to="/my-returns"
+                                            className="flex-1 btn bg-[#DA2439] text-white hover:bg-[#b91d30] text-center"
+                                        >
+                                            View Returns
+                                        </Link>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Select Items */}
+                                    <p className="text-gray-400 mb-3 text-sm font-medium">Select items to return:</p>
+                                    <div className="space-y-2 mb-5">
+                                        {order.items?.map(item => (
+                                            <label
+                                                key={item.id}
+                                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${returnItems[item.id]
+                                                        ? 'border-amber-500 bg-amber-500/10'
+                                                        : 'border-gray-700 hover:border-gray-600 bg-gray-900/50'
+                                                    }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!returnItems[item.id]}
+                                                    onChange={() => toggleReturnItem(item.id)}
+                                                    className="accent-amber-500 w-4 h-4"
+                                                />
+                                                <div className="w-12 h-14 bg-gray-800 rounded overflow-hidden flex-shrink-0">
+                                                    <img
+                                                        src={item.product?.images?.[0] || 'https://via.placeholder.com/48x56'}
+                                                        alt={item.product?.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-white text-sm font-medium truncate">{item.product?.name}</p>
+                                                    <p className="text-gray-500 text-xs">
+                                                        {item.variant?.size && `Size: ${item.variant.size}`}
+                                                        {item.variant?.color && ` | ${item.variant.color}`}
+                                                    </p>
+                                                </div>
+                                                {returnItems[item.id] && (
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.preventDefault(); updateReturnItemQty(item.id, returnItems[item.id] - 1); }}
+                                                            className="w-7 h-7 rounded bg-gray-700 text-white text-sm flex items-center justify-center hover:bg-gray-600"
+                                                        >-</button>
+                                                        <span className="w-8 text-center text-white text-sm">{returnItems[item.id]}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.preventDefault(); updateReturnItemQty(item.id, returnItems[item.id] + 1); }}
+                                                            className="w-7 h-7 rounded bg-gray-700 text-white text-sm flex items-center justify-center hover:bg-gray-600"
+                                                        >+</button>
+                                                        <span className="text-gray-500 text-xs ml-1">/{item.quantity}</span>
+                                                    </div>
+                                                )}
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {/* Refund Preview */}
+                                    {Object.keys(returnItems).length > 0 && (
+                                        <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg mb-5">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-green-400 text-sm font-medium">Estimated Refund</span>
+                                                <span className="text-green-400 font-bold text-lg">{formatPrice(getRefundPreview())}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Reason Selection */}
+                                    <p className="text-gray-400 mb-3 text-sm font-medium">Reason for return:</p>
+                                    <div className="space-y-2 mb-5">
+                                        {RETURN_REASONS.map(reason => (
+                                            <label
+                                                key={reason.id}
+                                                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${returnReason === reason.id
+                                                        ? 'border-[#DA2439] bg-[#DA2439]/10'
+                                                        : 'border-gray-700 hover:border-gray-600 bg-gray-900/50'
+                                                    }`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="returnReason"
+                                                    value={reason.id}
+                                                    checked={returnReason === reason.id}
+                                                    onChange={(e) => setReturnReason(e.target.value)}
+                                                    className="mt-1 accent-[#DA2439]"
+                                                />
+                                                <div>
+                                                    <p className="text-white font-medium text-sm">{reason.label}</p>
+                                                    <p className="text-gray-500 text-xs">{reason.description}</p>
+                                                </div>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {returnReason === 'other' && (
+                                        <div className="mb-4">
+                                            <textarea
+                                                value={returnOtherReason}
+                                                onChange={(e) => setReturnOtherReason(e.target.value)}
+                                                placeholder="Please specify your reason..."
+                                                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:border-[#DA2439] focus:outline-none resize-none text-sm"
+                                                rows={2}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Additional Description */}
+                                    <div className="mb-5">
+                                        <label className="text-gray-400 text-sm font-medium block mb-2">Additional details (optional)</label>
+                                        <textarea
+                                            value={returnDescription}
+                                            onChange={(e) => setReturnDescription(e.target.value)}
+                                            placeholder="Describe the issue in more detail..."
+                                            className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:border-[#DA2439] focus:outline-none resize-none text-sm"
+                                            rows={2}
+                                        />
+                                    </div>
+
+                                    {returnError && (
+                                        <p className="text-red-400 text-sm mb-4">{returnError}</p>
+                                    )}
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={closeReturnModal}
+                                            className="flex-1 btn bg-gray-800 text-white border border-gray-700 hover:bg-gray-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleSubmitReturn}
+                                            disabled={returnLoading || !returnReason || Object.keys(returnItems).length === 0}
+                                            className="flex-1 btn bg-[#DA2439] text-white hover:bg-[#b91d30] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {returnLoading ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                                    </svg>
+                                                    Submitting...
+                                                </span>
+                                            ) : 'Submit Return Request'}
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>

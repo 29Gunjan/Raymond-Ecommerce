@@ -1,0 +1,167 @@
+/* My Returns Page */
+.returns-status-timeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 1rem 0;
+}
+
+.returns-status-timeline .timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.returns-status-timeline .timeline-step .step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+}
+
+.returns-status-timeline .timeline-step.completed .step-dot {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.returns-status-timeline .timeline-step.active .step-dot {
+    background: #DA2439;
+    border-color: #DA2439;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(218, 36, 57, 0.15);
+}
+
+.returns-status-timeline .timeline-step.rejected .step-dot {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+.returns-status-timeline .timeline-step .step-label {
+    font-size: 10px;
+    margin-top: 6px;
+    text-align: center;
+    color: #94a3b8;
+    font-weight: 500;
+    max-width: 70px;
+    line-height: 1.2;
+}
+
+.returns-status-timeline .timeline-step.completed .step-label,
+.returns-status-timeline .timeline-step.active .step-label {
+    color: #334155;
+    font-weight: 600;
+}
+
+.returns-status-timeline .timeline-step.rejected .step-label {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.returns-status-timeline .timeline-connector {
+    flex: 1;
+    height: 2px;
+    background: #e2e8f0;
+    margin: 0 -4px;
+    margin-bottom: 20px;
+}
+
+.returns-status-timeline .timeline-connector.completed {
+    background: #22c55e;
+}
+
+/* Return Detail Page - Dark Theme */
+.return-detail-timeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 1rem 0;
+}
+
+.return-detail-timeline .timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.return-detail-timeline .timeline-step .step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 2;
+    border: 2px solid #374151;
+    background: #1f2937;
+    color: #6b7280;
+    transition: all 0.3s ease;
+}
+
+.return-detail-timeline .timeline-step.completed .step-dot {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.return-detail-timeline .timeline-step.active .step-dot {
+    background: #DA2439;
+    border-color: #DA2439;
+    color: white;
+    box-shadow: 0 0 0 4px rgba(218, 36, 57, 0.2);
+}
+
+.return-detail-timeline .timeline-step.rejected .step-dot {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+.return-detail-timeline .timeline-step .step-label {
+    font-size: 11px;
+    margin-top: 8px;
+    text-align: center;
+    color: #6b7280;
+    font-weight: 500;
+    max-width: 80px;
+    line-height: 1.2;
+}
+
+.return-detail-timeline .timeline-step.completed .step-label,
+.return-detail-timeline .timeline-step.active .step-label {
+    color: #d1d5db;
+    font-weight: 600;
+}
+
+.return-detail-timeline .timeline-step.rejected .step-label {
+    color: #f87171;
+    font-weight: 600;
+}
+
+.return-detail-timeline .timeline-connector {
+    flex: 1;
+    height: 2px;
+    background: #374151;
+    margin: 0 -4px;
+    margin-bottom: 24px;
+}
+
+.return-detail-timeline .timeline-connector.completed {
+    background: #22c55e;
+}
