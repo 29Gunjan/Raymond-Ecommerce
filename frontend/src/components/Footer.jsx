@@ -6,10 +6,10 @@ function Footer() {
     const footerLinks = {
         shop: [
             { to: '/products', label: 'All Products' },
-            { to: '/products/suits-blazers', label: 'Suits & Blazers' },
-            { to: '/products/shirts', label: 'Shirts' },
-            { to: '/products/trousers', label: 'Trousers' },
-            { to: '/products/accessories', label: 'Accessories' },
+            { to: '/category/suits-blazers', label: 'Suits & Blazers' },
+            { to: '/category/formal-shirts', label: 'Shirts' },
+            { to: '/category/trousers', label: 'Trousers' },
+            { to: '/category/accessories', label: 'Accessories' },
         ],
         support: [
             { to: '/track-order', label: 'Track Order' },

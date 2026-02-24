@@ -106,10 +106,19 @@ router.post('/products', async (req, res) => {
     try {
         const { name, slug, description, price, comparePrice, images, categoryId, featured, isNew, variants } = req.body;
 
+        // Auto-generate slug from name if not provided
+        const productSlug = slug || name
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim()
+            + '-' + Date.now().toString(36);
+
         const product = await prisma.product.create({
             data: {
                 name,
-                slug,
+                slug: productSlug,
                 description,
                 price,
                 comparePrice,
@@ -213,14 +222,28 @@ router.post('/categories', async (req, res) => {
     try {
         const { name, slug, description, image } = req.body;
 
+        // Auto-generate slug from name if not provided, with unique suffix
+        const categorySlug = slug || name
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim()
+            + '-' + Date.now().toString(36);
+
         const category = await prisma.category.create({
-            data: { name, slug, description, image }
+            data: {
+                name,
+                slug: categorySlug,
+                description: description || null,
+                image: image || null
+            }
         });
 
         res.status(201).json(category);
     } catch (error) {
         console.error('Create category error:', error);
-        res.status(500).json({ error: 'Failed to create category' });
+        res.status(500).json({ error: 'Failed to create category: ' + error.message });
     }
 });
 

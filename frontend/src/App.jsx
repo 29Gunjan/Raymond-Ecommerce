@@ -42,6 +42,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminReturns from './pages/admin/AdminReturns';
+import ChatWidget from './components/ChatWidget';
 
 // Admin Route Wrapper
 function AdminRoute({ children }) {
@@ -224,6 +225,7 @@ function App() {
                 </main>
                 <Footer />
             </div>
+            <ChatWidget />
         </div>
     );
 }
