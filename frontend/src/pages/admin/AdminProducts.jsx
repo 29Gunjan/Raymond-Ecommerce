@@ -15,7 +15,8 @@ function AdminProducts() {
         categoryId: '',
         images: [''],
         featured: false,
-        isNew: false
+        isNew: false,
+        variants: [{ size: '', color: '', stock: '' }]
     });
 
     useEffect(() => {
@@ -44,7 +45,10 @@ function AdminProducts() {
                 ...formData,
                 price: parseFloat(formData.price),
                 comparePrice: formData.comparePrice ? parseFloat(formData.comparePrice) : null,
-                images: formData.images.filter(img => img.trim())
+                images: formData.images.filter(img => img.trim()),
+                variants: formData.variants
+                    .filter(v => v.size.trim() && v.color.trim())
+                    .map(v => ({ size: v.size.trim(), color: v.color.trim(), stock: parseInt(v.stock) || 0 }))
             };
 
             if (editingProduct) {
@@ -71,7 +75,10 @@ function AdminProducts() {
             categoryId: product.categoryId,
             images: product.images?.length ? product.images : [''],
             featured: product.featured || false,
-            isNew: product.isNew || false
+            isNew: product.isNew || false,
+            variants: product.variants?.length
+                ? product.variants.map(v => ({ size: v.size, color: v.color, stock: v.stock.toString() }))
+                : [{ size: '', color: '', stock: '' }]
         });
         setShowModal(true);
     };
@@ -96,7 +103,8 @@ function AdminProducts() {
             categoryId: '',
             images: [''],
             featured: false,
-            isNew: false
+            isNew: false,
+            variants: [{ size: '', color: '', stock: '' }]
         });
     };
 
@@ -108,6 +116,21 @@ function AdminProducts() {
         const newImages = [...formData.images];
         newImages[index] = value;
         setFormData({ ...formData, images: newImages });
+    };
+
+    const addVariant = () => {
+        setFormData({ ...formData, variants: [...formData.variants, { size: '', color: '', stock: '' }] });
+    };
+
+    const removeVariant = (index) => {
+        const newVariants = formData.variants.filter((_, i) => i !== index);
+        setFormData({ ...formData, variants: newVariants.length ? newVariants : [{ size: '', color: '', stock: '' }] });
+    };
+
+    const updateVariant = (index, field, value) => {
+        const newVariants = [...formData.variants];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setFormData({ ...formData, variants: newVariants });
     };
 
     const formatPrice = (price) => {
@@ -295,6 +318,50 @@ function AdminProducts() {
                                 ))}
                                 <button type="button" onClick={addImageField} className="text-sm text-amber-500 hover:text-amber-400 transition-colors">
                                     + Add another image
+                                </button>
+                            </div>
+
+                            {/* Variants Section */}
+                            <div className="form-group">
+                                <label className="form-label">Variants (Size, Color, Stock)</label>
+                                <div className="space-y-3">
+                                    {formData.variants.map((variant, i) => (
+                                        <div key={i} className="flex gap-2 items-center">
+                                            <input
+                                                type="text"
+                                                className="form-input flex-1"
+                                                value={variant.size}
+                                                onChange={(e) => updateVariant(i, 'size', e.target.value)}
+                                                placeholder="Size (e.g. 38, M, L)"
+                                            />
+                                            <input
+                                                type="text"
+                                                className="form-input flex-1"
+                                                value={variant.color}
+                                                onChange={(e) => updateVariant(i, 'color', e.target.value)}
+                                                placeholder="Color (e.g. Navy Blue)"
+                                            />
+                                            <input
+                                                type="number"
+                                                className="form-input w-24"
+                                                value={variant.stock}
+                                                onChange={(e) => updateVariant(i, 'stock', e.target.value)}
+                                                placeholder="Stock"
+                                                min="0"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeVariant(i)}
+                                                className="text-red-400 hover:text-red-300 transition-colors px-2 py-1 text-lg"
+                                                title="Remove variant"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button type="button" onClick={addVariant} className="text-sm text-amber-500 hover:text-amber-400 transition-colors mt-2">
+                                    + Add another variant
                                 </button>
                             </div>
 

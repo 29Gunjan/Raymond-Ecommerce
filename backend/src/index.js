@@ -15,6 +15,7 @@ const addressRoutes = require('./routes/address.routes');
 const adminRoutes = require('./routes/admin.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const returnRoutes = require('./routes/return.routes');
+const chatRoutes = require('./routes/chat.routes');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/returns', returnRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

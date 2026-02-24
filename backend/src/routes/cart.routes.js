@@ -55,6 +55,10 @@ router.post('/add', authenticate, async (req, res) => {
     try {
         const { productId, variantId, quantity = 1 } = req.body;
 
+        if (!productId || !variantId) {
+            return res.status(400).json({ error: 'productId and variantId are required' });
+        }
+
         // Get or create cart
         let cart = await prisma.cart.findUnique({
             where: { userId: req.user.id }
@@ -127,7 +131,7 @@ router.post('/add', authenticate, async (req, res) => {
         });
     } catch (error) {
         console.error('Add to cart error:', error);
-        res.status(500).json({ error: 'Failed to add to cart' });
+        res.status(500).json({ error: 'Failed to add to cart: ' + error.message });
     }
 });
 

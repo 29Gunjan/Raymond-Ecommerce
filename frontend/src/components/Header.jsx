@@ -34,9 +34,9 @@ function Header() {
     const navLinks = [
         { to: '/', label: 'Home' },
         { to: '/products', label: 'Shop All' },
-        { to: '/products/suits-blazers', label: 'Suits' },
-        { to: '/products/shirts', label: 'Shirts' },
-        { to: '/products/trousers', label: 'Trousers' },
+        { to: '/category/suits-blazers', label: 'Suits' },
+        { to: '/category/formal-shirts', label: 'Shirts' },
+        { to: '/category/trousers', label: 'Trousers' },
     ];
 
     return (

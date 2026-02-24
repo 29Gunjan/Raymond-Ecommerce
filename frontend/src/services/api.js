@@ -107,7 +107,7 @@ export const addressesAPI = {
 // Admin API
 export const adminAPI = {
     // Dashboard
-    getStats: () => api.get('/admin/stats'),
+    getStats: () => api.get('/admin/dashboard'),
 
     // Products
     getProducts: (params) => api.get('/admin/products', { params }),
@@ -141,6 +141,11 @@ export const returnsAPI = {
     create: (data) => api.post('/returns', data),
     getAll: () => api.get('/returns'),
     getById: (id) => api.get(`/returns/${id}`)
+};
+
+// Chat API (AI Customer Support)
+export const chatAPI = {
+    send: (message) => api.post('/chat', { message })
 };
 
 export default api;

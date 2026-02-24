@@ -21,7 +21,11 @@ function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
     const [inWishlist, setInWishlist] = useState(false);
     const [reviews, setReviews] = useState([]);
+    const [reviewStats, setReviewStats] = useState(null);
     const [addingToCart, setAddingToCart] = useState(false);
+    const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', comment: '' });
+    const [submittingReview, setSubmittingReview] = useState(false);
+    const [reviewMessage, setReviewMessage] = useState(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -37,10 +41,10 @@ function ProductDetailPage() {
                     setSelectedColor(colors[0] || '');
                 }
 
-                // Fetch reviews - backend returns { reviews, stats }
                 try {
                     const reviewsRes = await reviewsAPI.getByProduct(res.data.id);
                     setReviews(reviewsRes.data?.reviews || []);
+                    setReviewStats(reviewsRes.data?.stats || null);
                 } catch (reviewError) {
                     console.error('Failed to fetch reviews:', reviewError);
                     setReviews([]);
@@ -108,6 +112,41 @@ function ProductDetailPage() {
             setInWishlist(!inWishlist);
         } catch (error) {
             toast.error('Something went wrong');
+        }
+    };
+
+    const handleSubmitReview = async (e) => {
+        e.preventDefault();
+        if (!isAuthenticated) {
+            toast.error('Please login to write a review');
+            return;
+        }
+        if (!reviewForm.comment.trim()) {
+            toast.error('Please write a comment');
+            return;
+        }
+        setSubmittingReview(true);
+        setReviewMessage(null);
+        try {
+            await reviewsAPI.add({
+                productId: product.id,
+                rating: reviewForm.rating,
+                title: reviewForm.title.trim(),
+                comment: reviewForm.comment.trim()
+            });
+            setReviewForm({ rating: 5, title: '', comment: '' });
+            setReviewMessage({ type: 'success', text: 'Review submitted successfully!' });
+            toast.success('Review submitted!');
+            // Refresh reviews
+            const reviewsRes = await reviewsAPI.getByProduct(product.id);
+            setReviews(reviewsRes.data?.reviews || []);
+            setReviewStats(reviewsRes.data?.stats || null);
+        } catch (error) {
+            const msg = error.response?.data?.error || 'Failed to submit review';
+            setReviewMessage({ type: 'error', text: msg });
+            toast.error(msg);
+        } finally {
+            setSubmittingReview(false);
         }
     };
 
@@ -358,6 +397,122 @@ function ProductDetailPage() {
                 {/* Reviews Section */}
                 <section className="mt-16" data-aos="fade-up">
                     <h2 className="text-3xl font-heading font-bold text-slate-900 mb-8">Customer Reviews</h2>
+
+                    {/* Review Stats */}
+                    {reviewStats && reviewStats.total > 0 && (
+                        <div className="bg-white rounded-2xl border border-slate-100 p-8 mb-8 shadow-sm">
+                            <div className="flex flex-col md:flex-row items-center gap-8">
+                                <div className="text-center">
+                                    <div className="text-5xl font-bold text-slate-900 mb-1">{reviewStats.average}</div>
+                                    <div className="flex items-center gap-1 mb-1 justify-center">
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <svg key={star} className={`w-5 h-5 ${star <= Math.round(reviewStats.average) ? 'text-yellow-500' : 'text-slate-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                    <p className="text-sm text-slate-500">{reviewStats.total} review{reviewStats.total !== 1 ? 's' : ''}</p>
+                                </div>
+                                <div className="flex-1 w-full">
+                                    {[5, 4, 3, 2, 1].map(star => (
+                                        <div key={star} className="flex items-center gap-3 mb-1">
+                                            <span className="text-sm text-slate-600 w-4">{star}</span>
+                                            <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                            <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="h-full bg-yellow-500 rounded-full transition-all" style={{ width: `${reviewStats.total > 0 ? (reviewStats.distribution[star] / reviewStats.total) * 100 : 0}%` }} />
+                                            </div>
+                                            <span className="text-sm text-slate-500 w-6">{reviewStats.distribution[star]}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Write Review Form */}
+                    <div className="bg-white rounded-2xl border border-slate-100 p-8 mb-8 shadow-sm">
+                        <h3 className="text-xl font-bold text-slate-900 mb-6">Write a Review</h3>
+                        {!isAuthenticated ? (
+                            <p className="text-slate-500">Please <Link to="/login" className="text-[#DA2439] font-semibold hover:underline">log in</Link> to write a review.</p>
+                        ) : (
+                            <form onSubmit={handleSubmitReview} className="space-y-5">
+                                {reviewMessage && (
+                                    <div className={`px-4 py-3 rounded-xl text-sm font-medium ${reviewMessage.type === 'success'
+                                            ? 'bg-green-50 text-green-700 border border-green-200'
+                                            : 'bg-red-50 text-red-700 border border-red-200'
+                                        }`}>
+                                        {reviewMessage.text}
+                                    </div>
+                                )}
+
+                                {/* Star Rating */}
+                                <div>
+                                    <label className="block font-semibold text-slate-900 mb-3">Rating</label>
+                                    <div className="flex items-center gap-2">
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                                className="transition-transform hover:scale-110"
+                                            >
+                                                <svg
+                                                    className={`w-8 h-8 ${star <= reviewForm.rating ? 'text-yellow-500' : 'text-slate-200'} transition-colors`}
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            </button>
+                                        ))}
+                                        <span className="ml-2 text-sm text-slate-500 font-medium">{reviewForm.rating} / 5</span>
+                                    </div>
+                                </div>
+
+                                {/* Title */}
+                                <div>
+                                    <label className="block font-semibold text-slate-900 mb-2">Title (optional)</label>
+                                    <input
+                                        type="text"
+                                        value={reviewForm.title}
+                                        onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
+                                        placeholder="Summarize your experience"
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-[#DA2439] focus:ring-1 focus:ring-[#DA2439] transition-colors text-slate-900"
+                                    />
+                                </div>
+
+                                {/* Comment */}
+                                <div>
+                                    <label className="block font-semibold text-slate-900 mb-2">Your Review</label>
+                                    <textarea
+                                        value={reviewForm.comment}
+                                        onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                                        placeholder="Tell others what you think about this product..."
+                                        rows={4}
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:border-[#DA2439] focus:ring-1 focus:ring-[#DA2439] transition-colors text-slate-900 resize-none"
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={submittingReview || !reviewForm.comment.trim()}
+                                    className="px-8 py-3.5 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {submittingReview ? (
+                                        <>
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Submitting...
+                                        </>
+                                    ) : (
+                                        'Submit Review'
+                                    )}
+                                </button>
+                            </form>
+                        )}
+                    </div>
+
+                    {/* Reviews List */}
                     {reviews.length === 0 ? (
                         <div className="bg-white border border-slate-100 rounded-2xl p-10 text-center">
                             <div className="w-16 h-16 mx-auto mb-4 text-slate-300">
@@ -371,7 +526,7 @@ function ProductDetailPage() {
                         <div className="grid md:grid-cols-2 gap-6">
                             {reviews.map(review => (
                                 <div key={review.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                                    <div className="flex items-center gap-1 mb-3">
+                                    <div className="flex items-center gap-1 mb-2">
                                         {[1, 2, 3, 4, 5].map(star => (
                                             <svg
                                                 key={star}
@@ -383,8 +538,14 @@ function ProductDetailPage() {
                                             </svg>
                                         ))}
                                     </div>
+                                    {review.title && (
+                                        <h4 className="font-semibold text-slate-900 mb-1">{review.title}</h4>
+                                    )}
                                     <p className="text-slate-700 mb-4 leading-relaxed">"{review.comment}"</p>
-                                    <p className="text-sm text-slate-500 font-medium">— {review.user?.name}</p>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm text-slate-500 font-medium">— {review.user?.name}</p>
+                                        <p className="text-xs text-slate-400">{new Date(review.createdAt).toLocaleDateString()}</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>

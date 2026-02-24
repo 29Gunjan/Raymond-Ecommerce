@@ -162,7 +162,7 @@ function HomePage() {
                                     Shop Collection
                                 </Link>
                                 <Link
-                                    to="/products/suits-blazers"
+                                    to="/category/suits-blazers"
                                     className="px-8 py-4 border-2 border-slate-300 text-slate-800 font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all duration-300"
                                 >
                                     Explore Suits
@@ -240,7 +240,7 @@ function HomePage() {
                         {categories.map((category) => (
                             <Link
                                 key={category.id}
-                                to={`/products/${category.slug}`}
+                                to={`/category/${category.slug}`}
                                 className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
                             >
                                 {/* Background Image */}

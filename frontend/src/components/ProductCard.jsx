@@ -35,7 +35,7 @@ function ProductCard({ product }) {
         }
 
         try {
-            await addToCart(product.id, quantity, selectedVariant?.id);
+            await addToCart(product.id, selectedVariant?.id, quantity);
             setShowQuickView(false);
             setQuantity(1);
             setSelectedVariant(null);
