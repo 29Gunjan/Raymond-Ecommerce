@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { runCustomerSupport } = require('../services/aiChat.service');
+const { authenticate } = require('../middleware/auth.middleware');
 
-// POST /api/chat — AI Customer Support
-router.post('/', async (req, res) => {
+// POST /api/chat — AI Customer Support (requires login)
+router.post('/', authenticate, async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, history } = req.body;
 
         if (!message || message.trim() === '') {
             return res.status(400).json({
@@ -22,7 +23,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        const result = await runCustomerSupport(message.trim());
+        const result = await runCustomerSupport(message.trim(), history || []);
 
         res.json({
             success: true,
@@ -30,7 +31,8 @@ router.post('/', async (req, res) => {
                 category: result.category,
                 sentiment: result.sentiment,
                 response: result.response,
-                escalated: result.escalated
+                escalated: result.escalated,
+                products: result.products || []
             }
         });
     } catch (error) {

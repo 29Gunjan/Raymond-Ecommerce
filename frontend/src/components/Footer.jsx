@@ -203,7 +203,7 @@ function Footer() {
             <div className="border-t border-gray-800 bg-gray-950">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-                        <p>© {currentYear} Raymond. All rights reserved. Crafted with ❤️ in India</p>
+                        <p>© {currentYear} Raymond. All rights reserved.</p>
                         <div className="flex gap-6">
                             <Link to="/privacy" className="hover:text-[#DA2439] transition-colors">Privacy Policy</Link>
                             <Link to="/terms" className="hover:text-[#DA2439] transition-colors">Terms of Service</Link>

@@ -426,6 +426,32 @@ router.put('/users/:id/role', async (req, res) => {
     }
 });
 
+// Get orders for a specific user
+router.get('/users/:id/orders', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const orders = await prisma.order.findMany({
+            where: { userId: id },
+            include: {
+                items: {
+                    include: {
+                        product: { select: { name: true, images: true, slug: true } },
+                        variant: true
+                    }
+                },
+                address: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        res.json({ orders });
+    } catch (error) {
+        console.error('Get user orders error:', error);
+        res.status(500).json({ error: 'Failed to fetch user orders' });
+    }
+});
+
 // Returns management
 router.get('/returns', async (req, res) => {
     try {

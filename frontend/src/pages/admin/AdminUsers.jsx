@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
+import './AdminUsers.css';
 
 function AdminUsers() {
     const [users, setUsers] = useState([]);
@@ -7,6 +8,12 @@ function AdminUsers() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRole, setSelectedRole] = useState('all');
     const [updating, setUpdating] = useState(null);
+
+    // Orders panel state
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [userOrders, setUserOrders] = useState([]);
+    const [ordersLoading, setOrdersLoading] = useState(false);
+    const [showOrdersPanel, setShowOrdersPanel] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -38,12 +45,63 @@ function AdminUsers() {
         }
     };
 
+    const handleViewOrders = async (user) => {
+        setSelectedUser(user);
+        setShowOrdersPanel(true);
+        setOrdersLoading(true);
+        try {
+            const res = await adminAPI.getUserOrders(user.id);
+            setUserOrders(res.data.orders || []);
+        } catch (error) {
+            console.error('Failed to fetch user orders:', error);
+            setUserOrders([]);
+        } finally {
+            setOrdersLoading(false);
+        }
+    };
+
+    const closeOrdersPanel = () => {
+        setShowOrdersPanel(false);
+        setSelectedUser(null);
+        setUserOrders([]);
+    };
+
     const formatDate = (date) => {
         return new Date(date).toLocaleDateString('en-IN', {
             day: 'numeric',
             month: 'short',
             year: 'numeric'
         });
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0
+        }).format(price);
+    };
+
+    const getStatusClass = (status) => {
+        const map = {
+            PENDING: 'status-pending',
+            CONFIRMED: 'status-confirmed',
+            PROCESSING: 'status-processing',
+            SHIPPED: 'status-shipped',
+            DELIVERED: 'status-delivered',
+            CANCELLED: 'status-cancelled'
+        };
+        return map[status] || 'status-pending';
+    };
+
+    const getPaymentStatusClass = (status) => {
+        const map = {
+            PENDING: 'payment-pending',
+            PAID: 'payment-paid',
+            FAILED: 'payment-failed',
+            REFUNDED: 'payment-refunded'
+        };
+        return map[status] || 'payment-pending';
     };
 
     const filteredUsers = users.filter(user => {
@@ -153,8 +211,8 @@ function AdminUsers() {
                                                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                                     disabled={updating === user.id}
                                                     className={`px-3 py-1 rounded-lg text-xs font-medium border cursor-pointer ${user.role === 'ADMIN'
-                                                            ? 'bg-purple-500/10 text-purple-400 border-purple-500/30'
-                                                            : 'bg-gray-700 text-gray-300 border-gray-600'
+                                                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+                                                        : 'bg-gray-700 text-gray-300 border-gray-600'
                                                         } ${updating === user.id ? 'opacity-50' : ''}`}
                                                 >
                                                     <option value="USER">USER</option>
@@ -171,7 +229,7 @@ function AdminUsers() {
                                                 <div className="flex gap-2">
                                                     <button
                                                         className="px-3 py-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded hover:bg-blue-500/20 transition-colors"
-                                                        onClick={() => alert(`View orders for ${user.name}`)}
+                                                        onClick={() => handleViewOrders(user)}
                                                     >
                                                         View Orders
                                                     </button>
@@ -185,6 +243,111 @@ function AdminUsers() {
                     </div>
                 </div>
             </div>
+
+            {/* Orders Slide-Out Panel */}
+            {showOrdersPanel && (
+                <div className="orders-panel-overlay" onClick={closeOrdersPanel}>
+                    <div className="orders-panel" onClick={(e) => e.stopPropagation()}>
+                        {/* Panel Header */}
+                        <div className="orders-panel-header">
+                            <div>
+                                <h2 className="orders-panel-title">
+                                    Orders — {selectedUser?.name || 'User'}
+                                </h2>
+                                <p className="orders-panel-subtitle">{selectedUser?.email}</p>
+                            </div>
+                            <button className="orders-panel-close" onClick={closeOrdersPanel}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Panel Body */}
+                        <div className="orders-panel-body">
+                            {ordersLoading ? (
+                                <div className="orders-panel-loading">
+                                    <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <p>Loading orders...</p>
+                                </div>
+                            ) : userOrders.length === 0 ? (
+                                <div className="orders-panel-empty">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
+                                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
+                                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                                        <path d="M16 10a4 4 0 01-8 0"></path>
+                                    </svg>
+                                    <p>No orders found for this user</p>
+                                </div>
+                            ) : (
+                                <div className="orders-list">
+                                    {userOrders.map(order => (
+                                        <div key={order.id} className="order-card">
+                                            {/* Order Header */}
+                                            <div className="order-card-header">
+                                                <div>
+                                                    <p className="order-number">#{order.orderNumber}</p>
+                                                    <p className="order-date">{formatDate(order.createdAt)}</p>
+                                                </div>
+                                                <div className="order-badges">
+                                                    <span className={`order-status ${getStatusClass(order.status)}`}>
+                                                        {order.status}
+                                                    </span>
+                                                    <span className={`order-payment ${getPaymentStatusClass(order.paymentStatus)}`}>
+                                                        {order.paymentStatus}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Order Items */}
+                                            <div className="order-items">
+                                                {order.items?.map(item => (
+                                                    <div key={item.id} className="order-item">
+                                                        <div className="order-item-image">
+                                                            {item.product?.images?.[0] ? (
+                                                                <img src={item.product.images[0]} alt={item.product.name} />
+                                                            ) : (
+                                                                <div className="order-item-placeholder">
+                                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                                                    </svg>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="order-item-details">
+                                                            <p className="order-item-name">{item.product?.name || 'Product'}</p>
+                                                            {item.variant && (
+                                                                <p className="order-item-variant">
+                                                                    {item.variant.size && `Size: ${item.variant.size}`}
+                                                                    {item.variant.size && item.variant.color && ' · '}
+                                                                    {item.variant.color && `Color: ${item.variant.color}`}
+                                                                </p>
+                                                            )}
+                                                            <p className="order-item-qty">Qty: {item.quantity}</p>
+                                                        </div>
+                                                        <p className="order-item-price">{formatPrice(item.price * item.quantity)}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Order Footer */}
+                                            <div className="order-card-footer">
+                                                <span className="order-method">
+                                                    {order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod}
+                                                </span>
+                                                <span className="order-total">Total: {formatPrice(order.total)}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
