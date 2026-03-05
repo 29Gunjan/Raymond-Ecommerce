@@ -10,12 +10,13 @@
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-/* Top Bar - Premium Dark */
+/* Top Bar - Premium Light */
 .header-top {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: #fff;
+    background: linear-gradient(135deg, #f8f6f3 0%, #f0ece4 100%);
+    color: var(--text-secondary);
     padding: 0.625rem 0;
     font-size: 0.8125rem;
+    border-bottom: 1px solid rgba(184, 134, 11, 0.12);
 }
 
 .header-top-content {
@@ -31,13 +32,13 @@
 }
 
 .header-top-links a {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--text-secondary);
     transition: all var(--transition-fast);
     font-weight: 500;
 }
 
 .header-top-links a:hover {
-    color: #d4a842;
+    color: #b8860b;
 }
 
 .header-top-links .separator {

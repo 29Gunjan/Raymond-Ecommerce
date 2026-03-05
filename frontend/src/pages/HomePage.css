@@ -393,14 +393,15 @@
     line-height: 1.6;
 }
 
-/* Newsletter Banner - Premium Dark */
+/* Newsletter Banner - Premium Light */
 .newsletter-banner {
     padding: 5rem 2.5rem;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #f8f6f3 0%, #f0ece4 100%);
     border-radius: var(--radius-3xl);
     text-align: center;
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(184, 134, 11, 0.15);
 }
 
 .newsletter-banner::before {
@@ -422,13 +423,13 @@
 }
 
 .newsletter-banner h3 {
-    color: #fff;
+    color: var(--text-primary);
     position: relative;
     z-index: 1;
 }
 
 .newsletter-banner p {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     position: relative;
     z-index: 1;
 }
