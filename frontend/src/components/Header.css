@@ -1,22 +1,22 @@
-/* Header Styles - Premium White Theme */
+/* Header Styles - Dark Theme */
 .header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(15, 17, 23, 0.92);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Top Bar - Premium Light */
+/* Top Bar - Dark Premium */
 .header-top {
-    background: linear-gradient(135deg, #f8f6f3 0%, #f0ece4 100%);
-    color: var(--text-secondary);
+    background: linear-gradient(135deg, #0a0b10 0%, #12141f 100%);
+    color: rgba(255, 255, 255, 0.7);
     padding: 0.625rem 0;
     font-size: 0.8125rem;
-    border-bottom: 1px solid rgba(184, 134, 11, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .header-top-content {
@@ -32,13 +32,13 @@
 }
 
 .header-top-links a {
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     transition: all var(--transition-fast);
     font-weight: 500;
 }
 
 .header-top-links a:hover {
-    color: #b8860b;
+    color: #d4a842;
 }
 
 .header-top-links .separator {
@@ -252,7 +252,7 @@
 
 .user-dropdown-header {
     padding: 1.25rem;
-    background: linear-gradient(135deg, #fafbfc 0%, #f5f7f9 100%);
+    background: linear-gradient(135deg, #161922 0%, #1c1f2e 100%);
     border-bottom: 1px solid var(--border);
 }
 
