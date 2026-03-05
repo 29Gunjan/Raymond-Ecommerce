@@ -95,9 +95,27 @@ router.post('/register', async (req, res) => {
     try {
         const { email, password, name, phone } = req.body;
 
+        // Input validation
+        if (!email || !password || !name) {
+            return res.status(400).json({ error: 'Email, password, and name are required' });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: 'Invalid email format' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+        }
+
+        if (name.trim().length < 2) {
+            return res.status(400).json({ error: 'Name must be at least 2 characters' });
+        }
+
         // Check if user exists
         const existingUser = await prisma.user.findUnique({
-            where: { email }
+            where: { email: email.toLowerCase().trim() }
         });
 
         if (existingUser) {
@@ -172,9 +190,14 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // Input validation
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
         // Find user
         const user = await prisma.user.findUnique({
-            where: { email }
+            where: { email: email.toLowerCase().trim() }
         });
 
         if (!user) {
@@ -262,6 +285,15 @@ router.put('/password', authenticate, async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
 
+        // Validation
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Current password and new password are required' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: 'New password must be at least 6 characters' });
+        }
+
         const user = await prisma.user.findUnique({
             where: { id: req.user.id }
         });
@@ -333,6 +365,15 @@ router.post('/forgot-password', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
     try {
         const { token, password } = req.body;
+
+        // Validation
+        if (!token || !password) {
+            return res.status(400).json({ error: 'Token and password are required' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+        }
 
         const user = await prisma.user.findFirst({
             where: {

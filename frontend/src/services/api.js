@@ -123,6 +123,7 @@ export const adminAPI = {
     // Users
     getUsers: () => api.get('/admin/users'),
     updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
+    getUserOrders: (userId) => api.get(`/admin/users/${userId}/orders`),
 
     // Categories
     getCategories: () => api.get('/categories'),

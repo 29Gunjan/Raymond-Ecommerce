@@ -7,6 +7,7 @@ const WELCOME_MSG = {
     text: "Welcome to Raymond Support! I'm your AI assistant. Ask me about products, orders, billing, or any technical issues.",
     category: null,
     sentiment: null,
+    products: [],
 };
 
 export default function ChatWidget() {
@@ -27,6 +28,14 @@ export default function ChatWidget() {
         }
     }, [isOpen]);
 
+    // Build conversation history for memory
+    const getHistory = () => {
+        return messages
+            .filter(m => m.role === 'user' || m.role === 'bot')
+            .slice(-8) // Last 8 messages (4 exchanges)
+            .map(m => ({ role: m.role, text: m.text }));
+    };
+
     const sendMessage = async () => {
         const trimmed = input.trim();
         if (!trimmed || loading) return;
@@ -36,7 +45,8 @@ export default function ChatWidget() {
         setLoading(true);
 
         try {
-            const { data } = await api.post('/chat', { message: trimmed });
+            const history = getHistory();
+            const { data } = await api.post('/chat', { message: trimmed, history });
             if (data.success) {
                 setMessages((prev) => [
                     ...prev,
@@ -46,6 +56,7 @@ export default function ChatWidget() {
                         category: data.data.category,
                         sentiment: data.data.sentiment,
                         escalated: data.data.escalated,
+                        products: data.data.products || [],
                     },
                 ]);
             } else {
@@ -59,6 +70,7 @@ export default function ChatWidget() {
                     text: err?.response?.data?.error || 'Sorry, something went wrong. Please try again later.',
                     category: null,
                     sentiment: null,
+                    products: [],
                 },
             ]);
         } finally {
@@ -75,6 +87,14 @@ export default function ChatWidget() {
 
     const clearChat = () => {
         setMessages([WELCOME_MSG]);
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 0
+        }).format(price);
     };
 
     return (
@@ -117,7 +137,7 @@ export default function ChatWidget() {
                                 <h3 className="chat-header__title">Raymond AI Support</h3>
                                 <span className="chat-header__status">
                                     <span className="chat-header__dot"></span>
-                                    Online
+                                    Online · RAG Enabled
                                 </span>
                             </div>
                         </div>
@@ -147,17 +167,60 @@ export default function ChatWidget() {
                                 )}
                                 <div className="chat-msg__content">
                                     <p className="chat-msg__text">{msg.text}</p>
+
+                                    {/* Product Cards from RAG */}
+                                    {msg.products && msg.products.length > 0 && (
+                                        <div className="chat-products">
+                                            {msg.products.map((product, idx) => (
+                                                <a
+                                                    key={idx}
+                                                    href={`/product/${product.slug}`}
+                                                    className="chat-product-card"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <div className="chat-product-card__image">
+                                                        {product.image ? (
+                                                            <img src={product.image} alt={product.name} />
+                                                        ) : (
+                                                            <div className="chat-product-card__placeholder">
+                                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                                                </svg>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="chat-product-card__info">
+                                                        <p className="chat-product-card__name">{product.name}</p>
+                                                        <div className="chat-product-card__pricing">
+                                                            <span className="chat-product-card__price">{formatPrice(product.price)}</span>
+                                                            {product.comparePrice && product.comparePrice > product.price && (
+                                                                <span className="chat-product-card__compare">{formatPrice(product.comparePrice)}</span>
+                                                            )}
+                                                        </div>
+                                                        <span className={`chat-product-card__stock ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
+                                                            {product.inStock ? 'In Stock' : 'Out of Stock'}
+                                                        </span>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Meta Badges */}
                                     {msg.category && (
                                         <div className="chat-msg__meta">
                                             <span className={`chat-badge chat-badge--${msg.category}`}>
-                                                {msg.category}
+                                                {msg.category.replace('_', ' ')}
                                             </span>
                                             <span className={`chat-badge chat-badge--${msg.sentiment}`}>
                                                 {msg.sentiment}
                                             </span>
                                             {msg.escalated && (
                                                 <span className="chat-badge chat-badge--escalated">
-                                                    ⚡ Escalated
+                                                    Escalated
                                                 </span>
                                             )}
                                         </div>
@@ -196,7 +259,7 @@ export default function ChatWidget() {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Type your message..."
+                            placeholder="Ask about products, orders, stock..."
                             disabled={loading}
                         />
                         <button
