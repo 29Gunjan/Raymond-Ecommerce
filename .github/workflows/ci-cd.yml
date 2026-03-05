@@ -67,18 +67,20 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy (Pull & Run)
+    name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend]
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deployment ready
-        run: |
-          echo "✅ Images pushed successfully!"
-          echo "Backend:  ${{ env.BACKEND_IMAGE }}:latest"
-          echo "Frontend: ${{ env.FRONTEND_IMAGE }}:latest"
-          echo ""
-          echo "To deploy on any server, run:"
-          echo "  docker compose -f docker-compose.prod.yml up -d"
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/raymond-ecommerce
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --force-recreate
+            docker image prune -f
+            echo "✅ Deployed successfully!"
