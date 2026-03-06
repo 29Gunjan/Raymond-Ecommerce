@@ -90,6 +90,9 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/chat', chatLimiter, chatRoutes);
 
+// Favicon — suppress 502 for browser auto-requests
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Raymond E-commerce API is running' });
