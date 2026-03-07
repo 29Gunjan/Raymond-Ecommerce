@@ -7,8 +7,6 @@
 #   DOCKERHUB_USERNAME, DATABASE_URL, JWT_SECRET
 # ============================================================
 
-version: "3.8"
-
 services:
   backend:
     image: ${DOCKERHUB_USERNAME:-gunja29}/raymond-backend:latest

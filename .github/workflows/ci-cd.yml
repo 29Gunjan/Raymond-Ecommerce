@@ -72,6 +72,19 @@ jobs:
     needs: [build-backend, build-frontend]
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.prod.yml"
+          target: "/home/ubuntu/raymond-ecommerce/"
+          overwrite: true
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         env:
@@ -92,6 +105,10 @@ jobs:
           script: |
             cd /home/ubuntu/raymond-ecommerce
 
+            # Stop and remove old Docker Postgres if it exists
+            docker stop raymond-db 2>/dev/null || true
+            docker rm raymond-db 2>/dev/null || true
+
             # Write backend.env with all secrets
             echo 'DATABASE_URL="'"${DATABASE_URL}"'"' > backend.env
             echo "JWT_SECRET=${JWT_SECRET}" >> backend.env
@@ -108,7 +125,7 @@ jobs:
             echo "RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}" >> backend.env
             echo "GROQ_API_KEY=${GROQ_API_KEY}" >> backend.env
 
-            # Pull and deploy
+            # Pull and deploy (Neon DB — no local Postgres)
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --force-recreate
