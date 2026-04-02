@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(authenticate);
 router.use(isAdmin);
 
-// Dashboard stats
+
 router.get('/dashboard', async (req, res) => {
     try {
         const [
