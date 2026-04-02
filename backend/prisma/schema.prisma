@@ -7,6 +7,219 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                String          @id @default(cuid())
+  email             String          @unique
+  password          String
+  name              String
+  phone             String?
+  googleId          String?         @unique
+  role              Role            @default(USER)
+  emailVerified     Boolean         @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  addresses         Address[]
+  cart              Cart?
+  orders            Order[]
+  returns           ReturnRequest[]
+  reviews           Review[]
+  wishlist          Wishlist?
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id           String           @id @default(cuid())
+  name         String
+  slug         String           @unique
+  description  String
+  price        Float
+  comparePrice Float?
+  images       String[]
+  featured     Boolean          @default(false)
+  isNew        Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  categoryId   String
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  category     Category         @relation(fields: [categoryId], references: [id])
+  variants     ProductVariant[]
+  returnItems  ReturnItem[]
+  reviews      Review[]
+  wishlists    WishlistItem[]
+}
+
+model ProductVariant {
+  id         String      @id @default(cuid())
+  size       String
+  color      String
+  stock      Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  productId  String
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String         @id @default(cuid())
+  quantity  Int            @default(1)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cartId    String
+  productId String
+  variantId String
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product        @relation(fields: [productId], references: [id])
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  @@unique([cartId, productId, variantId])
+}
+
+model Order {
+  id                String          @id @default(cuid())
+  orderNumber       String          @unique
+  status            OrderStatus     @default(PENDING)
+  paymentStatus     PaymentStatus   @default(PENDING)
+  paymentMethod     String          @default("COD")
+  subtotal          Float
+  shipping          Float           @default(0)
+  tax               Float           @default(0)
+  total             Float
+  notes             String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  cancelReason      String?
+  cancelOtp         String?
+  cancelOtpExpiry   DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  userId            String
+  addressId         String
+  address           Address         @relation(fields: [addressId], references: [id])
+  user              User            @relation(fields: [userId], references: [id])
+  items             OrderItem[]
+  returns           ReturnRequest[]
+}
+
+model OrderItem {
+  id          String         @id @default(cuid())
+  quantity    Int
+  price       Float
+  createdAt   DateTime       @default(now())
+  orderId     String
+  productId   String
+  variantId   String
+  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product        @relation(fields: [productId], references: [id])
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  returnItems ReturnItem[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  comment   String
+  title     String?
+  rating    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  phone     String
+  city      String
+  pincode   String
+  street    String
+  name      String
+  state     String
+  country   String   @default("India")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders    Order[]
+}
+
+model Wishlist {
+  id        String         @id @default(cuid())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  userId    String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     WishlistItem[]
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  wishlistId String
+  productId  String
+  createdAt  DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+
+  @@unique([wishlistId, productId])
+}
+
+model ReturnRequest {
+  id           String       @id @default(cuid())
+  returnNumber String       @unique
+  reason       String
+  description  String?
+  status       ReturnStatus @default(REQUESTED)
+  refundAmount Float
+  refundMethod String       @default("ORIGINAL")
+  adminNotes   String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  orderId      String
+  userId       String
+  items        ReturnItem[]
+  order        Order        @relation(fields: [orderId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+}
+
+model ReturnItem {
+  id          String        @id @default(cuid())
+  quantity    Int
+  returnId    String
+  orderItemId String
+  productId   String
+  orderItem   OrderItem     @relation(fields: [orderItemId], references: [id])
+  product     Product       @relation(fields: [productId], references: [id])
+  return      ReturnRequest @relation(fields: [returnId], references: [id], onDelete: Cascade)
+}
+
 enum Role {
   USER
   ADMIN
@@ -35,257 +248,4 @@ enum ReturnStatus {
   PICKED_UP
   RECEIVED
   REFUNDED
-}
-
-model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  password          String
-  name              String
-  phone             String?
-  googleId          String?   @unique
-  role              Role      @default(USER)
-  emailVerified     Boolean   @default(false)
-  verificationToken String?
-  resetToken        String?
-  resetTokenExpiry  DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  addresses Address[]
-  orders    Order[]
-  reviews   Review[]
-  cart      Cart?
-  wishlist  Wishlist?
-  returns   ReturnRequest[]
-}
-
-model Category {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  description String?
-  image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  products Product[]
-}
-
-model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String
-  price       Float
-  comparePrice Float?
-  images      String[]
-  featured    Boolean  @default(false)
-  isNew       Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  variants   ProductVariant[]
-  reviews    Review[]
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  wishlists  WishlistItem[]
-  returnItems ReturnItem[]
-}
-
-model ProductVariant {
-  id        String   @id @default(cuid())
-  size      String
-  color     String
-  stock     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-}
-
-model Cart {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String   @unique
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  items CartItem[]
-}
-
-model CartItem {
-  id        String   @id @default(cuid())
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cartId    String
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
-
-  @@unique([cartId, productId, variantId])
-}
-
-model Order {
-  id            String        @id @default(cuid())
-  orderNumber   String        @unique
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod String        @default("COD")
-  subtotal      Float
-  shipping      Float         @default(0)
-  tax           Float         @default(0)
-  total         Float
-  notes         String?
-  
-  // Razorpay fields
-  razorpayOrderId   String?
-  razorpayPaymentId String?
-  
-  // Cancellation fields
-  cancelReason      String?
-  cancelOtp         String?
-  cancelOtpExpiry   DateTime?
-  
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  addressId String
-  address   Address @relation(fields: [addressId], references: [id])
-
-  items   OrderItem[]
-  returns ReturnRequest[]
-}
-
-model OrderItem {
-  id        String   @id @default(cuid())
-  quantity  Int
-  price     Float
-  createdAt DateTime @default(now())
-
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
-
-  returnItems ReturnItem[]
-}
-
-model Review {
-  id        String   @id @default(cuid())
-  comment   String
-  title     String?
-  rating    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-
-  @@unique([userId, productId])
-}
-
-model Address {
-  id        String   @id @default(cuid())
-  phone     String
-  city      String
-  pincode   String
-  street    String
-  name      String
-  state     String
-  country   String   @default("India")
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  orders Order[]
-}
-
-model Wishlist {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  items WishlistItem[]
-}
-
-model WishlistItem {
-  id        String   @id @default(cuid())
-
-
-
-  wishlistId String
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
-
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@unique([wishlistId, productId])
-}
-
-model ReturnRequest {
-  id            String       @id @default(cuid())
-  returnNumber  String       @unique
-  reason        String
-  description   String?
-  status        ReturnStatus @default(REQUESTED)
-  refundAmount  Float
-  refundMethod  String       @default("ORIGINAL")
-  adminNotes    String?
-
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
-  orderId       String
-  order         Order        @relation(fields: [orderId], references: [id])
-
-  userId        String
-  user          User         @relation(fields: [userId], references: [id])
-
-  items         ReturnItem[]
-}
-
-model ReturnItem {
-  id            String        @id @default(cuid())
-  quantity      Int
-
-  returnId      String
-  return        ReturnRequest @relation(fields: [returnId], references: [id], onDelete: Cascade)
-
-  orderItemId   String
-  orderItem     OrderItem     @relation(fields: [orderItemId], references: [id])
-
-  productId     String
-  product       Product       @relation(fields: [productId], references: [id])
 }
